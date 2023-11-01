@@ -378,7 +378,77 @@ So using foreign keys makes the hassle of manually loading data stored in other 
 
 Now this has all been about saving and loading data, what about updating and deleting data?  
 
-For updating data, you just call the `save` method again after making your changes and as long as you didnt change the Primary Key, it should update just fine.  
-Deleting data is just calling one of the `delete` methods. One of these takes in a class and an id and the other takes in an object. 
+Let's change our database population to be directly controlled instead of random  
+```java
+Person person1 = new Person("John", "Smith", 32);
+person1.setAddress(new Address(123, "Foo", "Bar"));
+person1.addTransaction(new Transaction(100, 123456789));
+person1.addTransaction(new Transaction(400, 987654321));
+database.save(person1);
+```
+This is just some data we can control and know for a fact if things are being saved correctly when we start changing things.  
+For refence, this is the console output after fetching from the database.  
+```txt
+Person{id=1, firstName='John', lastName='Smith', age=32, address=Address{id=1, streetNumber=123, city='Foo', state='Bar', personid=1}, transactions=[Transaction{id=1, amount=100, timestamp=123456789, personid=1}, Transaction{id=2, amount=400, timestamp=987654321, personid=1}]}
+```
+And this is what the tables look like  
+<img width="174" alt="Screenshot 2023-11-01 101958" src="https://github.com/StarDevelopmentLLC/StarData/assets/9711989/a21c220d-0932-47ba-b3cf-848760cfe991">  
+<img width="229" alt="Screenshot 2023-11-01 102145" src="https://github.com/StarDevelopmentLLC/StarData/assets/9711989/af563a3c-fbbc-44a9-a133-80e9efabb943">  
+<img width="206" alt="Screenshot 2023-11-01 102218" src="https://github.com/StarDevelopmentLLC/StarData/assets/9711989/013b40e4-db96-4816-a02d-f2b47c592985">  
 
-MORE COMING
+For the next bit, this is what I have to work with, I have removed the creation of this one since it is now in the database and we will be working solely off of the database values.  
+```java
+Person person = database.get(Person.class).get(0);
+Address address = person.getAddress();
+List<Transaction> transactions = person.getTransactions();
+Transaction transaction1 = transactions.get(0);
+Transaction transaction2 = transactions.get(1);
+```
+Doing it this way is technically not recommended as you should be using loops and/or checks against the size of things. But for this tutorial, we know for a fact that this is how it is set up.  
+The variables above are for cleaner and easier to read code and will still work as intended as java is pass-by-reference when it comes to these objects and the getters return the actual values and not copies.  
+Lets say we want to change the `state` of the address, and update our database  
+```
+address.setState("Baz");
+database.save(address);
+```
+We can also save the Person object and it will do the same thing.  
+<img width="231" alt="Screenshot 2023-11-01 103056" src="https://github.com/StarDevelopmentLLC/StarData/assets/9711989/e6456c54-8279-4b4e-9214-a2e667268c1e">  
+Do note, if you were working on a copy of the address object, it would not update what is stored in the person variable as it only updates the database, however since we are working on the object directly, it also updates the field in the Person instance due to how Java works. This applies to everything, it may be changed in the database, or removed and any references in our code will still exist until they are garbage collected, or the program ends.  
+
+Let's remove a transaction  
+This first way is using the class and ID, this is useful if you know the table, and know the ID(s) of the records you want to remove without having a reference to the Object instance.  
+```java
+database.delete(Transaction.class, 1);
+```
+This will go to the database and say "Hey, can you delete a transaction with the id of 1?" and the database will do it.  
+<img width="191" alt="Screenshot 2023-11-01 103600" src="https://github.com/StarDevelopmentLLC/StarData/assets/9711989/fe0866e5-53f7-4459-8e67-90a8d5f80317">  
+Now our database only has one transaction because we removed one.  
+The other way to do it is using an instance of a record  
+```java
+database.delete(transaction1);
+```
+And it will do the same thing as the other on, in fact, this method parses the values and calls the earlier method anyways  
+
+Keep in mind as well, all of these methods for saving and deleting have a `xSilent` version which just silences any exceptions  
+
+This whole system allows for CRUD based interation, which is Create, Read, Update and Delete on the database.  
+
+However, the Foreign Key feature only allows for One-To-Many and One-To-One relationships on the parent to child tables, I am not entirely sure how I want to implement doing One-To-Many going from the child to the parent table (This is having one entry in the child table to many entries in the parent table). An example of this is having multiple people having the same address entry (So the same id in the address table). This will be in the future if either myself or someone can do a pull request for this functionality. I may have to do some reworking on the backend to support this without recursive errors.  
+
+## Using ObjectCodecs
+Lets talk about ObjectCodecs, which is a system to allow converting an object into a String and a String into an object. The String is the one saved to the database and the object is the one returned from the database. This is useful if you want to save data to a column instead of using the Foreign Keys to save an object to another table.  
+Lets create another class called `Position` with an `x`, `y` and `z` as integers. (Doing this because I am starting run out of ideas for modeling, and I use this type of thing in my Minecraft based projects)  
+```java
+public class Position {
+    private int x, y, z;
+
+    public Position(int x, int y, int z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
+    //Getters and Setters as well as an IntelliJ IDEA generated toString method
+}
+```
+
