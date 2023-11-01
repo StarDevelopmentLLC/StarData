@@ -1,6 +1,8 @@
-package com.stardevllc.stardata.mysql;
+package com.stardevllc.stardata.mysql.test;
 
 import com.stardevllc.stardata.api.interfaces.SQLDatabase;
+import com.stardevllc.stardata.mysql.MySQLDatabase;
+import com.stardevllc.stardata.mysql.MySQLProperties;
 import com.stardevllc.stardata.sql.StarSQL;
 import com.stardevllc.stardata.sql.objects.SQLDatabaseRegistry;
 

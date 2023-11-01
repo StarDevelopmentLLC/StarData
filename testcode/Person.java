@@ -1,4 +1,4 @@
-package com.stardevllc.stardata.mysql;
+package com.stardevllc.stardata.mysql.test;
 
 import com.stardevllc.stardata.api.annotations.ForeignKeyStorage;
 import com.stardevllc.stardata.api.annotations.Name;
