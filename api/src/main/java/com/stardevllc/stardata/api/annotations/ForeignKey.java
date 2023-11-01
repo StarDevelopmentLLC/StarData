@@ -1,6 +1,6 @@
 package com.stardevllc.stardata.api.annotations;
 
-import com.stardevllc.stardata.api.FKAction;
+import com.stardevllc.stardata.api.model.FKAction;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -21,7 +21,14 @@ public @interface ForeignKey {
      * The reference class must be registered before the class with the foreign key
      */
     Class<?> value();
-    
+
+    /**
+     * Similar to the {@link FKOnDelete} annotation, but holds the default value, which is the SQL default
+     */
     FKAction onDelete() default FKAction.RESTRICT;
+
+    /**
+     * Similar to the {@link FKOnUpdate} annotation, but holds the default value, which is the SQL default
+     */
     FKAction onUpdate() default FKAction.RESTRICT;
 }

@@ -1,6 +1,6 @@
 package com.stardevllc.stardata.sql.objects;
 
-import com.stardevllc.stardata.api.FKAction;
+import com.stardevllc.stardata.api.model.FKAction;
 import com.stardevllc.stardata.api.annotations.Codec;
 import com.stardevllc.stardata.api.annotations.ForeignKeyStorage;
 import com.stardevllc.stardata.api.annotations.Ignored;

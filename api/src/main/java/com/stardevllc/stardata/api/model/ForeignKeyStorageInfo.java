@@ -2,6 +2,9 @@ package com.stardevllc.stardata.api.model;
 
 import java.lang.reflect.Field;
 
+/**
+ * Internal class, ignore
+ */
 public class ForeignKeyStorageInfo {
     private Field field;
     private Class<?> childModelClass; //This is the class that maps to the table with the foreign key.

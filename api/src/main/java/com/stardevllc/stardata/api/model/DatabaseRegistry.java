@@ -7,10 +7,12 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.logging.Logger;
 
+/**
+ * Parent class for the SQL Entry point, this will be used for other database types when they get implemented
+ * @param <D> The databse type
+ */
 public abstract class DatabaseRegistry<D extends Database> extends StringRegistry<D> {
-    
     protected final Logger logger;
-    
     public DatabaseRegistry(Logger logger, Map<String, D> initialObjects) {
         super(initialObjects, key -> key.toLowerCase().replace(" ", "_"));
         this.logger = logger;

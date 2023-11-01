@@ -1,6 +1,6 @@
 package com.stardevllc.stardata.sql.objects;
 
-import com.stardevllc.stardata.api.FKAction;
+import com.stardevllc.stardata.api.model.FKAction;
 import com.stardevllc.stardata.api.annotations.*;
 import com.stardevllc.stardata.api.interfaces.ObjectCodec;
 import com.stardevllc.stardata.api.interfaces.SQLDatabase;
