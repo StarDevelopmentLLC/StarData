@@ -1,0 +1,46 @@
+plugins {
+    id 'java-library'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url = 'https://www.jitpack.io'
+    }
+}
+
+group 'com.stardevllc.stardata'
+version '1.0.0-SNAPSHOT'
+
+dependencies {
+    implementation 'com.github.StarDevelopmentLLC:StarLib:1.0.0-SNAPSHOT'
+}
+
+javadoc {
+    source = sourceSets.main.allJava
+    destinationDir = file("/docs")
+    options {
+        showFromPublic()
+        quiet()
+    }
+}
+
+tasks.withType(Javadoc).configureEach {
+    failOnError false
+    options.quiet()
+}
+
+shadowJar {
+    minimize()
+    relocate 'com.stardevllc.starlib', 'com.stardevllc.stardata.starlib'
+    archiveBaseName.set("StarData-API")
+}
+
+jar {
+    archiveBaseName.set("StarData-API")
+}
+
+jar.finalizedBy(shadowJar)
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)

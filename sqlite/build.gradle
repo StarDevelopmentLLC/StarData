@@ -1,0 +1,35 @@
+plugins {
+    id 'java-library'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url = 'https://www.jitpack.io'
+    }
+}
+
+group 'com.stardevllc.stardata'
+version '1.0.0-SNAPSHOT'
+
+shadowJar {
+    minimize()
+    relocate 'org.sqlite', 'com.stardevllc.stardata.driver.sqlite'
+    archiveBaseName.set("StarData-SQLite")
+}
+
+jar {
+    archiveBaseName.set("StarData-SQLite")
+}
+
+jar.finalizedBy(shadowJar)
+
+dependencies {
+    api project(path: ':api', configuration: 'shadow')
+    api project(':sql')
+    api 'org.xerial:sqlite-jdbc:3.43.0.0'
+    compileOnly 'com.github.StarDevelopmentLLC:StarLib:1.0.0-SNAPSHOT'
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)

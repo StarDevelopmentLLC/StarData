@@ -1,0 +1,35 @@
+plugins {
+    id 'java-library'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url = 'https://www.jitpack.io'
+    }
+}
+
+group 'com.stardevllc.stardata'
+version '1.0.0-SNAPSHOT'
+
+shadowJar {
+    minimize()
+    relocate 'org.h2', 'com.stardevllc.stardata.driver.h2'
+    archiveBaseName.set("StarData-H2")
+}
+
+jar {
+    archiveBaseName.set("StarData-H2")
+}
+
+jar.finalizedBy(shadowJar)
+
+dependencies {
+    api project(path: ':api', configuration: 'shadow')
+    api project(':sql')
+    api 'com.h2database:h2:2.2.220'
+    compileOnly 'com.github.StarDevelopmentLLC:StarLib:1.0.0-SNAPSHOT'
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
