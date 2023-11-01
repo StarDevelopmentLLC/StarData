@@ -194,12 +194,191 @@ public class Transaction {
     @Order(3) private long timestamp;
     @Order(4) private long personid;
 
-    public Transaction(int amount, long timestamp) {
-        this.amount = amount;
-        this.timestamp = timestamp;
-    }
-
-    private Transaction() {}
+    //Public cosntructor that takes in an int amount and long timestamp and assigns them to the fields
+    //Private No-Args constructor
+    //Standard Getters and Setters and an IntelliJ IDEA generated toString() method
 }
 ```  
 Note: Using an int for the amount because it looks nicer in the database and print-outs.  
+And Database Registration  
+```java
+database.registerClass(Transaction.class);
+```
+I did this registration after the Person registration, it will be important in the near future.  
+In the Person class, I added the following...  
+```java
+private List<Transaction> transactions = new ArrayList<>();
+
+public List<Transaction> getTransactions() {
+    return transactions;
+}
+    
+public void addTransaction(Transaction transaction) {
+    transaction.setPersonid(this.getId());
+    this.transactions.add(transaction);
+}
+```  
+In my populate method, I will be generating 5 transactions per person and saving them.  
+```java
+for (int i = 0; i < 10; i++) {
+    Person person = new Person(firstName, lastName, age);
+    database.save(person);
+            
+    for (int t = 0; t < 5; t++) {
+        Transaction transaction = new Transaction(amount, time);
+        person.addTransaction(transaction);
+        database.save(transaction);
+    }
+}
+```
+Notice how I am saving the person before I am doing things with the transactions? That is because in the basic form it is, there is no syncing going on as the transactions field in the Person class is ignored due to being a collection and it having nothing else to link it to other things.  
+For loading this data, the code is like this  
+```java
+List<Person> people = database.get(Person.class);
+for (Person person : people) {
+    List<Transaction> transactions = database.get(Transaction.class, "personid", person.getId());
+    person.getTransactions().addAll(transactions);
+    system.out.println(person);
+}
+```
+Table List  
+<img width="722" alt="Screenshot 2023-11-01 011614" src="https://github.com/StarDevelopmentLLC/StarData/assets/9711989/4829d09e-3763-4c47-894e-87a9ce4fecd8">
+The People table didn't change due to the transactions field being ignored  
+The transactons table with the first 10 rows (total of 50)  
+<img width="198" alt="Screenshot 2023-11-01 011714" src="https://github.com/StarDevelopmentLLC/StarData/assets/9711989/7cfce0df-3520-4e0c-b89d-bbf72a331f51">  
+And here is Gist of the console output from printing the person (It is too big to fit)  
+https://gist.github.com/Firestar311/fb85ea9052afb185b85ffe368faeeee4  
+
+In additon to this, to finish our structure for this tutorial, here is the last class and changes  
+```java
+@Name("addresses")
+public class Address {
+    @Order(1) private long id;
+    @Order(2) private int streetNumber;
+    @Order(3) private String city;
+    @Order(4) private String state;
+    @Order(5) private long personid;
+
+    //Public constructor that takes in an int streetNumber, String city and String state and assigns them to the fields.
+    //Private No-Args constructor
+    //Standard Getters and Setters and an IntelliJ IDEA generated toString() method
+}
+```
+Changes to Person  
+```java
+@Ignored private Address address;
+
+public Address getAddress() {
+    return address;
+}
+
+public void setAddress(Address address) {
+    address.setPersonid(this.getId());
+    this.address = address;
+}
+```
+The address field has to be ignored for now until we get further along. 
+And Database registration  
+```java
+database.registerClass(Address.class);
+```  
+This is added after the person is saved and before the transactions are generated in the population logic  
+```java
+Address address = new Address(streetNumber, city, state);
+person.setAddress(address);
+database.save(address);
+```
+
+And this is added after the addAll call on transactions  
+```java
+Address address = database.get(Address.class, "personid", person.getId()).get(0);
+person.setAddress(address);
+```
+Yes, I should be doing a size check, but I am not for the sake of the tutorial.  
+So, why did I do all of this repetition? Because repetition is good for learning. And this helped me to test the library as well before I released it.  
+
+By now, you can see where this can get tedious and still not super easy to manage the stuff, better than using SQL directly, but still pretty cumbersome.  
+For example, while writing this, I forgot some of the statements above and got errors, so I am not immune to making these mistakes. But this can be solved with a recently implemented feature, `Foreign Keys`.  
+
+These allow you to link tables together using the Primary Key in a parent table to link to a column in a child table.  
+We can do this for this example using the Person class (People table) as our parent table and the Address and Transaction classes as the child tables.  
+Note: This library supports more than 1 parent table, its just that for this example, only one parent table makes any sense.  
+
+The primary thing to keep in mind with foriegn keys in this library is that you need to have a field in the child class that is the same type as the primary key field in the parent class. The name doesn't matter as we will be using two annotations to link them together.  
+In our example, both the Transaction and Address classes have a field named `personid`, this is the field that we will be using with foriegn keys. This was intentional as I made this example first, then worked my way backwards for the tutorial.  
+
+First, lets add the foreign key to the address as this will be easier to demonstrate.  
+All you need to do is add the `@ForeignKey` annotation and specify the class of the parent table you want to link it to. The library will then find the Primary Key column automatically.  
+```java
+@ForeignKey(Person.class)
+@Order(5) private long personid;
+```
+We aren't done yet though, as if we want to save and load automatically into a field in the Person class, we need a `@ForeignKeyStorage` on the parent (Person) class.  
+We can also remove that `@Ignored` annotation from the address field.  
+```java
+@ForeignKeyStorage(clazz = Address.class, field = "personid")
+private Address address;
+```
+The `clazz` parameter is the class instance of the child class with teh foreign key.  
+The `field` parameter is the field name that has the `@ForeignKey` annotation with the class link.  
+I did it this way to support Generics, Collections and Maps as those type arguments are annoying to get at run-time and child classes can have multiple Foreign Keys, and it would be a lot of work for the library to have to search for it. This way, the programmer can specify it and make it clear when looking at either class to know what is going on.  
+Now, we don't have to set the personid field in the Address anymore as the library will do that automatically.  
+This is what the saving looks like (I changed the setAddress method to no longer set the personid and I made the address a constructor parameter)  
+```java
+Address address = new Address(streetNumber, city, state);
+Person person = new Person(firstName, lastName, age, address);
+database.save(person);
+```
+Now the `database.save` will do the hard work of making sure that the address is saved when the Person is saved.  
+Loading the person means we don't have to call the `Database.get()` method on the Address anymore as it will be loaded automatically due to that `@ForeignKeyStorage` annotation.  
+Here is the console output of one person just so you can see it. I omitted the transactions part of it.  
+```txt
+Person{id=1, firstName='ervpyu', lastName='jpisrx', age=7, address=Address{id=1, streetNumber=523, city='dtsd', state='iq', personid=1}, transactions=[{OMITTED}]}
+```  
+And yes, this is what it is in the database as well.  
+
+So now what about that list of Transactions? Well, we can do the same thing.  
+Change to the Transaction Class  
+```java
+@ForeignKey(Person.class)
+@Order(4) private long personid;
+```
+Change to the Person Class  
+```java
+@ForeignKeyStorage(clazz = Transaction.class, field = "personid")
+private List<Transaction> transactions = new ArrayList<>();
+```
+The real main difference is that you have to make sure that the collection field is not null.  
+So now I can remove the `transaction.setPersonid()` call in the `addTransaction` method on the Person and even add a constructor parameter to take in an initial set of transactions.  
+While I am at it, to make it easier to read, I wll change the amount of generated transactions to 2 per person.  
+So now the generation loop looks like  
+```java
+for (int i = 0; i < 10; i++) {
+    Address address = new Address(streetNumber, city, state);
+
+    List<Transaction> transactions = new ArrayList<>();
+    for (int t = 0; t < 2; t++) {
+        transactions.add(new Transaction(amount, time));
+    }
+            
+    Person person = new Person(generateString(6), generateString(6), generateAge(), address, transactions);
+    database.save(person);
+}
+```
+Loading has gone back to a single line  
+```java
+List<Person> people = database.get(Person.class);
+```
+And here is proof using a single console output  
+```txt
+Person{id=1, firstName='yfizcg', lastName='aumizv', age=67, address=Address{id=1, streetNumber=145, city='uyhr', state='bc', personid=1}, transactions=[Transaction{id=1, amount=870, timestamp=76738, personid=1}, Transaction{id=2, amount=940, timestamp=2942, personid=1}]}
+```
+
+So using foreign keys makes the hassle of manually loading data stored in other classes much cleaner and easier. 
+
+Now this has all been about saving and loading data, what about updating and deleting data?  
+
+For updating data, you just call the `save` method again after making your changes and as long as you didnt change the Primary Key, it should update just fine.  
+Deleting data is just calling one of the `delete` methods. One of these takes in a class and an id and the other takes in an object. 
+
+MORE COMING
