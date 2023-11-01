@@ -14,7 +14,6 @@ import com.stardevllc.starlib.reflection.ReflectionHelper;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.sql.*;
 import java.util.*;
 import java.util.Map.Entry;
@@ -129,40 +128,14 @@ public abstract class AbstractSQLDatabase implements SQLDatabase {
         for (ForeignKeyStorageInfo info : infos) {
             List<?> foreignKeyObjects = get(info.getChildModelClass(), info.getForeignKeyField(), row.getObject(row.getTable().getPrimaryKeyColumn().getName()));
             if (Collection.class.isAssignableFrom(info.getField().getType())) {
-                Method addMethod = null;
-                for (Method classMethod : ReflectionHelper.getClassMethods(info.getField().getType())) {
-                    if (classMethod.getName().equalsIgnoreCase("add") && classMethod.getParameterCount() == 1) {
-                        addMethod = classMethod;
-                        break;
-                    }
-                }
-
-                addMethod.setAccessible(true);
-
-                System.out.println(addMethod);
-
-                for (Object fko : foreignKeyObjects) {
-                    try {
-                        addMethod.invoke(info.getField().get(object), fko);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
+                Collection<Object> collection = (Collection<Object>) info.getField().get(object);
+                collection.addAll(foreignKeyObjects); //TODO May not work now
             } else if (Map.class.isAssignableFrom(info.getField().getType())) {
-                Method putMethod = null;
-                for (Method classMethod : ReflectionHelper.getClassMethods(info.getField().getType())) {
-                    if (classMethod.getName().equalsIgnoreCase("put")) {
-                        putMethod = classMethod;
-                        break;
-                    }
-                }
-
-                putMethod.setAccessible(true);
+                Map<Object, Object> map = (Map<Object, Object>) info.getField().get(object);
                 Field keyField = ReflectionHelper.getClassField(info.getChildModelClass(), info.getMapKeyField());
-                keyField.setAccessible(true);
                 for (Object fko : foreignKeyObjects) {
                     Object key = keyField.get(fko);
-                    putMethod.invoke(info.getField().get(object), key, fko);
+                    map.put(key, fko); //TODO May not work now.
                 }
             } else {
                 info.getField().set(object, foreignKeyObjects.get(0));
