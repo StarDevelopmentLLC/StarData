@@ -58,14 +58,14 @@ public class SQLColumn implements Column {
         }
         
         if (field.isAnnotationPresent(Type.class)) {
-            String codecType = field.getAnnotation(Type.class).value();
+            String typeValue = field.getAnnotation(Type.class).value();
             if (this.codec != null) {
-                if (!codecType.toLowerCase().startsWith("varchar")) {
+                if (!typeValue.toLowerCase().startsWith("varchar")) {
                     throw new IllegalArgumentException("Field " + field.getName() + " in class " + table.getModelClass().getName() + " is annotated with the ColumnType annotation and specifies a non-varchar value. This is not allowed by this library.");
                 }
             }
 
-            type = codecType;
+            type = typeValue;
         }
         
         if (typeHandler == null && codec == null) {
@@ -103,7 +103,9 @@ public class SQLColumn implements Column {
             } 
 
             if (this.typeHandler != null) {
-                type = this.typeHandler.getMysqlType();
+                if (this.type == null || this.type.isEmpty()) {
+                    type = this.typeHandler.getMysqlType();
+                }
             } else {
                 throw new IllegalArgumentException("Could not determine a handler or a codec for the field type " + field.getType().getName() + " in class " + table.getModelClass().getName());
             }
