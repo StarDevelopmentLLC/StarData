@@ -17,6 +17,7 @@ shadowJar {
     minimize()
     exclude('com.google.protobuf')
     relocate 'com.mysql', 'com.stardevllc.stardata.driver.mysql'
+    relocate 'com.stardevllc.starlib', 'com.stardevllc.stardata.starlib'
     archiveBaseName.set("StarData-MySQL")
 }
 

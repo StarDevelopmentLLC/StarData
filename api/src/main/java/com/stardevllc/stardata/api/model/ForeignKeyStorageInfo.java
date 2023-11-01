@@ -30,4 +30,14 @@ public class ForeignKeyStorageInfo {
     public String getMapKeyField() {
         return mapKeyField;
     }
+
+    @Override
+    public String toString() {
+        return "ForeignKeyStorageInfo{" +
+                "field=" + field.getName() +
+                ", childModelClass=" + childModelClass +
+                ", foreignKeyField='" + foreignKeyField + '\'' +
+                ", mapKeyField='" + mapKeyField + '\'' +
+                '}';
+    }
 }

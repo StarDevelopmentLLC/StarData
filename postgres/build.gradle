@@ -16,6 +16,7 @@ version '1.0.0-SNAPSHOT'
 shadowJar {
     minimize()
     relocate 'org.postgresql', 'com.stardevllc.stardata.driver.postgresql'
+    relocate 'com.stardevllc.starlib', 'com.stardevllc.stardata.starlib'
     archiveBaseName.set("StarData-PostgreSQL")
 }
 

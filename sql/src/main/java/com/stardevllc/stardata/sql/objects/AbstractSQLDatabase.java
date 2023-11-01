@@ -116,6 +116,10 @@ public abstract class AbstractSQLDatabase implements SQLDatabase {
                 if (data == null) {
                     continue;
                 }
+                
+                if (column.hasForeignKey()) {
+                    data = get(column.getParentForeignKeyTable().getModelClass(), column.getParentForeignKeyColumn().getName(), data).get(0);
+                }
 
                 column.getField().setAccessible(true);
                 column.getField().set(object, data);
@@ -129,13 +133,13 @@ public abstract class AbstractSQLDatabase implements SQLDatabase {
             List<?> foreignKeyObjects = get(info.getChildModelClass(), info.getForeignKeyField(), row.getObject(row.getTable().getPrimaryKeyColumn().getName()));
             if (Collection.class.isAssignableFrom(info.getField().getType())) {
                 Collection<Object> collection = (Collection<Object>) info.getField().get(object);
-                collection.addAll(foreignKeyObjects); //TODO May not work now
+                collection.addAll(foreignKeyObjects);
             } else if (Map.class.isAssignableFrom(info.getField().getType())) {
                 Map<Object, Object> map = (Map<Object, Object>) info.getField().get(object);
                 Field keyField = ReflectionHelper.getClassField(info.getChildModelClass(), info.getMapKeyField());
                 for (Object fko : foreignKeyObjects) {
                     Object key = keyField.get(fko);
-                    map.put(key, fko); //TODO May not work now.
+                    map.put(key, fko);
                 }
             } else {
                 info.getField().set(object, foreignKeyObjects.get(0));
@@ -230,7 +234,7 @@ public abstract class AbstractSQLDatabase implements SQLDatabase {
         return objects;
     }
 
-    protected SQLPushInfo generateObjectPushInfo(Object object) {
+    protected SQLPushInfo generateObjectPushInfo(Object object) throws Exception {
         Class<?> clazz = object.getClass();
         Table table = getTable(clazz);
         if (table == null) {
@@ -253,6 +257,17 @@ public abstract class AbstractSQLDatabase implements SQLDatabase {
 
                 if (column.getTypeHandler() != null) {
                     value = column.getTypeHandler().getSerializer().serialize(column, value);
+                }
+
+                if (column.hasForeignKey()) {
+                    Class<?> type = column.getField().getType();
+                    if (column.getTypeHandler().matches(type)) {
+                        value = column.getField().get(object);
+                    } else {
+                        Object fieldValue = column.getField().get(object);
+                        save(fieldValue);
+                        value = column.getParentForeignKeyColumn().getField().get(fieldValue);
+                    }
                 }
 
                 if (value instanceof String str) {

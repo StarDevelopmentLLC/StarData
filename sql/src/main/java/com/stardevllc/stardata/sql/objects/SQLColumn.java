@@ -1,5 +1,6 @@
 package com.stardevllc.stardata.sql.objects;
 
+import com.stardevllc.stardata.api.FKAction;
 import com.stardevllc.stardata.api.annotations.*;
 import com.stardevllc.stardata.api.interfaces.ObjectCodec;
 import com.stardevllc.stardata.api.interfaces.SQLDatabase;
@@ -31,6 +32,8 @@ public class SQLColumn implements Column {
     
     private Table parentForeignKeyTable; //This is the table that this column references
     private Column parentForeignKeyColumn; 
+    
+    private FKAction fkOnDelete, fkOnUpdate;
     
     /**
      * Constructs a column based on a class and the Field
@@ -72,6 +75,32 @@ public class SQLColumn implements Column {
                     break;
                 }
             }
+            
+            ForeignKey foreignKeyData = field.getAnnotation(ForeignKey.class);
+            if (foreignKeyData != null) {
+                this.parentForeignKeyTable = database.getTable(foreignKeyData.value());
+                if (this.parentForeignKeyTable != null) {
+                    this.parentForeignKeyColumn = this.parentForeignKeyTable.getPrimaryKeyColumn();
+                }
+                
+                if (this.typeHandler == null) {
+                    this.typeHandler = this.parentForeignKeyColumn.getTypeHandler();
+                }
+
+                FKOnDelete onDeleteAnnotation = field.getAnnotation(FKOnDelete.class);
+                if (onDeleteAnnotation != null) {
+                    this.fkOnDelete = onDeleteAnnotation.value();
+                } else {
+                    this.fkOnDelete = foreignKeyData.onDelete();
+                }
+
+                FKOnUpdate onUpdateAnnotation = field.getAnnotation(FKOnUpdate.class);
+                if (onUpdateAnnotation != null) {
+                    this.fkOnUpdate = onUpdateAnnotation.value();
+                } else {
+                    this.fkOnUpdate = foreignKeyData.onUpdate();
+                }
+            } 
 
             if (this.typeHandler != null) {
                 type = this.typeHandler.getMysqlType();
@@ -121,14 +150,16 @@ public class SQLColumn implements Column {
             this.order = table.getColumnOrderIndex();
             table.setColumnOrderIndex(this.order + 1);
         }
-        
-        if (field.isAnnotationPresent(ForeignKey.class)) {
-            ForeignKey foreignKey = field.getAnnotation(ForeignKey.class);
-            this.parentForeignKeyTable = database.getTable(foreignKey.value());
-            if (this.parentForeignKeyTable != null) {
-                this.parentForeignKeyColumn = this.parentForeignKeyTable.getPrimaryKeyColumn();
-            }
-        }
+    }
+
+    @Override
+    public FKAction getForeignKeyOnDeleteAction() {
+        return this.fkOnDelete;
+    }
+
+    @Override
+    public FKAction getForeignKeyOnUpdateAction() {
+        return this.fkOnUpdate;
     }
 
     public List<ForeignKeyStorageInfo> getForeignKeyStorageInfos() {

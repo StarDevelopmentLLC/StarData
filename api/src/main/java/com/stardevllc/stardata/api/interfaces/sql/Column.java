@@ -1,5 +1,6 @@
 package com.stardevllc.stardata.api.interfaces.sql;
 
+import com.stardevllc.stardata.api.FKAction;
 import com.stardevllc.stardata.api.annotations.Codec;
 import com.stardevllc.stardata.api.annotations.Name;
 import com.stardevllc.stardata.api.annotations.Order;
@@ -103,4 +104,14 @@ public interface Column extends Comparable<Column> {
      * @return Gets all information about linked foreign keys. This is only populated on the Primary Key column.
      */
     List<ForeignKeyStorageInfo> getForeignKeyStorageInfos();
+
+    /**
+     * @return The SQL Action that happens for when a row is deleted in a linked foreign key table
+     */
+    FKAction getForeignKeyOnDeleteAction();
+
+    /**
+     * @return The SQL Action that happens for when a row is updated in a linked foreign key table
+     */
+    FKAction getForeignKeyOnUpdateAction();
 }

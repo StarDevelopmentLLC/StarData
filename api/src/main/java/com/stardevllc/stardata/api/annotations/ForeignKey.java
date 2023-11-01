@@ -1,5 +1,7 @@
 package com.stardevllc.stardata.api.annotations;
 
+import com.stardevllc.stardata.api.FKAction;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -19,10 +21,7 @@ public @interface ForeignKey {
      * The reference class must be registered before the class with the foreign key
      */
     Class<?> value();
-
-    /**
-     * This is the field in the parent table that actually stores the row when loaded from the database. <br>
-     * This field must be annotated with {@link ForeignKeyStorage} annotation
-     */
-    String storageField() default "";
+    
+    FKAction onDelete() default FKAction.RESTRICT;
+    FKAction onUpdate() default FKAction.RESTRICT;
 }

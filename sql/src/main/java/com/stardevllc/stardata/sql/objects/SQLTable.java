@@ -1,5 +1,6 @@
 package com.stardevllc.stardata.sql.objects;
 
+import com.stardevllc.stardata.api.FKAction;
 import com.stardevllc.stardata.api.annotations.Codec;
 import com.stardevllc.stardata.api.annotations.ForeignKeyStorage;
 import com.stardevllc.stardata.api.annotations.Ignored;
@@ -187,7 +188,9 @@ public class SQLTable implements Table {
             if (column.hasForeignKey()) {
                 Table reference = column.getParentForeignKeyTable();
                 Column fkColumn = column.getParentForeignKeyColumn();
-                sb.append(", foreign key (`").append(column.getName()).append("`) references `").append(reference.getName()).append("`(`").append(fkColumn.getName()).append("`)").append(" on delete cascade on update cascade");
+                FKAction onDelete = column.getForeignKeyOnDeleteAction();
+                FKAction onUpdate = column.getForeignKeyOnUpdateAction();
+                sb.append(", foreign key (`").append(column.getName()).append("`) references `").append(reference.getName()).append("`(`").append(fkColumn.getName()).append("`)").append(" on delete ").append(onDelete.name().toLowerCase().replace("_", " ")).append(" on update ").append(onUpdate.name().toLowerCase().replace("_", " "));
             }
 
             sb.append(", ");
