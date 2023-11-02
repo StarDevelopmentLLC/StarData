@@ -39,15 +39,7 @@ public class SQLDatabaseRegistry extends DatabaseRegistry<SQLDatabase> {
     @Override
     public void setup() throws Exception {
         for (SQLDatabase database : getObjects().values()) {
-            for (Table table : database.getTables()) {
-                String sql = table.generateCreationStatement();
-                try {
-                    database.execute(sql);
-                } catch (Exception e) {
-                    getLogger().warning(sql);
-                    throw e;
-                }
-            }
+            database.setup();
         }
         this.setup = true;
     }

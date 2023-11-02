@@ -33,14 +33,14 @@ public class SQLTable implements Table {
      * @param database   The Database that this table is registered to.
      * @param modelClass The class to use
      */
-    public SQLTable(AbstractSQLDatabase database, Class<?> modelClass) {
+    public SQLTable(AbstractSQLDatabase database, Class<?> modelClass) throws Exception {
         this.database = database;
         this.modelClass = modelClass;
 
         try {
             modelClass.getDeclaredConstructor();
         } catch (NoSuchMethodException e) {
-            throw new RuntimeException("Could not find default constructor for class " + modelClass.getName());
+            throw new Exception("Could not find default constructor for class " + modelClass.getName());
         }
 
         name = determineTableName(modelClass);
@@ -90,7 +90,7 @@ public class SQLTable implements Table {
 
             if (column.isPrimaryKey()) {
                 if (this.primaryKeyColumn != null) {
-                    throw new IllegalArgumentException("Multiple Primary key Columns exist for table " + this.name);
+                    throw new Exception("Multiple Primary key Columns exist for table " + this.name);
                 }
                 this.primaryKeyColumn = column;
             }

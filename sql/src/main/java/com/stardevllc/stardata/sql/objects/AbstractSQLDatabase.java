@@ -23,11 +23,14 @@ public abstract class AbstractSQLDatabase implements SQLDatabase {
     protected Logger logger;
     protected String url, name, user, password;
     protected boolean primary;
+    protected Set<Class<?>> registeredClasses = new HashSet<>();
     protected Set<Table> tables = new LinkedHashSet<>();
     protected Set<TypeHandler> typeHandlers = new HashSet<>();
     protected SQLDatabaseRegistry registry;
 
     protected final LinkedList<Object> queue = new LinkedList<>();
+
+    protected boolean setup;
 
     protected AbstractSQLDatabase() {
     }
@@ -61,10 +64,14 @@ public abstract class AbstractSQLDatabase implements SQLDatabase {
 
     @Override
     public void registerClass(Class<?> clazz) {
-        try {
-            this.tables.add(new SQLTable(this, clazz));
-        } catch (Exception e) {
-            e.printStackTrace();
+        this.registeredClasses.add(clazz);
+        
+        if (this.isSetup()) {
+            try {
+                SQLTable table = new SQLTable(this, clazz);
+                execute(table.generateCreationStatement());
+                this.tables.add(table);
+            } catch (Exception e) {}
         }
     }
 
@@ -112,11 +119,11 @@ public abstract class AbstractSQLDatabase implements SQLDatabase {
 
             try {
                 Object data = row.getObject(key);
-                
+
                 if (data == null) {
                     continue;
                 }
-                
+
                 if (column.hasForeignKey()) {
                     data = get(column.getParentForeignKeyTable().getModelClass(), column.getParentForeignKeyColumn().getName(), data).get(0);
                 }
@@ -380,7 +387,7 @@ public abstract class AbstractSQLDatabase implements SQLDatabase {
             e.printStackTrace();
         }
     }
-    
+
     private void updateAndSaveFKStorageObject(ForeignKeyStorageInfo info, Object storageObject, Object primaryKeyObject) throws Exception {
         Field foreignKeyField = ReflectionHelper.getClassField(info.getChildModelClass(), info.getForeignKeyField());
         foreignKeyField.setAccessible(true);
@@ -652,5 +659,22 @@ public abstract class AbstractSQLDatabase implements SQLDatabase {
     @Override
     public SQLDatabaseRegistry getRegistry() {
         return registry;
+    }
+
+    @Override
+    public void setup() throws Exception {
+        if (this.setup) {
+            return;
+        }
+
+        for (Class<?> clazz : this.registeredClasses) {
+            this.tables.add(new SQLTable(this, clazz));
+        }
+
+        for (Table table : getTables()) {
+            execute(table.generateCreationStatement());
+        }
+
+        this.setup = true;
     }
 }

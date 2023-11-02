@@ -131,4 +131,15 @@ public interface Database {
      * Flushes the queue. This does catch SQL Exceptions
      */
     void flush();
+
+    /**
+     * @return If this database has been setup yet, this is usually handled by a DatabaseRegistry
+     */
+    boolean isSetup();
+
+    /**
+     * Set up this database so that it can be used. 
+     * @throws Exception Any exceptions that are thrown. 
+     */
+    void setup() throws Exception;
 }
