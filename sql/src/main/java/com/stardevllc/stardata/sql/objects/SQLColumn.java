@@ -11,7 +11,10 @@ import com.stardevllc.stardata.api.model.ForeignKeyStorageInfo;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 public class SQLColumn implements Column {
@@ -66,12 +69,12 @@ public class SQLColumn implements Column {
         }
         
         if (typeHandler == null && codec == null) {
-            Set<TypeHandler> typeHandlers = this.table.getDatabase().getTypeHandlers();
-            for (TypeHandler typeHandler : typeHandlers) {
-                System.out.println(typeHandler.getClass().getName());
-            }
-            for (TypeHandler typeHandler : typeHandlers) {
-                if (typeHandler.matches(this.field.getType())) {
+            for (TypeHandler typeHandler : this.table.getDatabase().getTypeHandlers()) {
+                System.out.println(this.field.getType().getName());
+                System.out.println(typeHandler.getMainClass().getName());
+                boolean matches = typeHandler.matches(this.field.getType());
+                System.out.println(matches);
+                if (matches) {
                     this.typeHandler = typeHandler;
                     break;
                 }
