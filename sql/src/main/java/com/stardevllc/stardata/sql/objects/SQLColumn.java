@@ -70,11 +70,7 @@ public class SQLColumn implements Column {
         
         if (typeHandler == null && codec == null) {
             for (TypeHandler typeHandler : this.table.getDatabase().getTypeHandlers()) {
-                System.out.println("Field Type: " + this.field.getType().getName());
-                System.out.println("Handler Main: " + typeHandler.getMainClass().getName());
-                boolean matches = typeHandler.matches(this.field.getType());
-                System.out.println("Matches Result: " + matches);
-                if (matches) {
+                if (typeHandler.matches(this.field.getType())) {
                     this.typeHandler = typeHandler;
                     break;
                 }
