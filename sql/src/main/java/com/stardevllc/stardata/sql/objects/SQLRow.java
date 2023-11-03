@@ -19,24 +19,24 @@ public class SQLRow implements Row {
     public SQLRow(ResultSet rs, AbstractSQLDatabase database) {
         try {
             ResultSetMetaData metaData = rs.getMetaData();
-            table = database.getTable(metaData.getTableName(1));
-            
             for (int i = 1; i <= metaData.getColumnCount(); i++) {
+                table = database.getTable(metaData.getTableName(i));
                 String columnName = metaData.getColumnName(i).toLowerCase();
                 Column column = table.getColumn(columnName);
                 if (column == null) {
                     continue;
                 }
                 
+                String columnLabel = metaData.getColumnLabel(i);
                 if (rs.getObject(i) == null) {
-                    this.data.put(columnName, null);
+                    this.data.put(columnLabel, null);
                 } else if (column.getCodec() != null) {
-                    data.put(columnName, column.getCodec().decode(rs.getString(i)));
+                    data.put(columnLabel, column.getCodec().decode(rs.getString(i)));
                 } else if (column.getTypeHandler() != null) {
                     Object object = column.getTypeHandler().getDeserializer().deserialize(column, rs.getObject(i));
-                    this.data.put(columnName, object);
+                    this.data.put(columnLabel, object);
                 } else {
-                    this.data.put(columnName, rs.getObject(i));
+                    this.data.put(columnLabel, rs.getObject(i));
                 }
             }
         } catch (SQLException e) {

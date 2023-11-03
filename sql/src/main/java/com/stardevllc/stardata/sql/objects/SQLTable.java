@@ -1,12 +1,9 @@
 package com.stardevllc.stardata.sql.objects;
 
-import com.stardevllc.stardata.api.model.FKAction;
-import com.stardevllc.stardata.api.annotations.Codec;
-import com.stardevllc.stardata.api.annotations.ForeignKeyStorage;
-import com.stardevllc.stardata.api.annotations.Ignored;
-import com.stardevllc.stardata.api.annotations.Name;
+import com.stardevllc.stardata.api.annotations.*;
 import com.stardevllc.stardata.api.interfaces.sql.Column;
 import com.stardevllc.stardata.api.interfaces.sql.Table;
+import com.stardevllc.stardata.api.model.FKAction;
 import com.stardevllc.stardata.api.model.ForeignKeyStorageInfo;
 import com.stardevllc.starlib.observable.ObservableValue;
 import com.stardevllc.starlib.reflection.ReflectionHelper;
@@ -24,7 +21,9 @@ public class SQLTable implements Table {
     private Column primaryKeyColumn;
     private int columnOrderIndex = 1000;
 
-
+    private Set<Class<?>> requiredClasses = new HashSet<>();
+    private List<Field> columnFields = new ArrayList<>();
+    
     private List<Field> foreignKeyStorageFields = new ArrayList<>();
 
     /**
@@ -55,10 +54,15 @@ public class SQLTable implements Table {
             if (field.isAnnotationPresent(Ignored.class)) {
                 continue;
             }
-            
+
             if (field.isAnnotationPresent(ForeignKeyStorage.class)) {
                 this.foreignKeyStorageFields.add(field);
                 continue;
+            }
+            
+            ForeignKey foreignKey = field.getAnnotation(ForeignKey.class);
+            if (foreignKey != null) {
+                this.requiredClasses.add(foreignKey.value());
             }
 
             if (Modifier.isStatic(field.getModifiers()) && Modifier.isFinal(field.getModifiers())) {
@@ -81,7 +85,17 @@ public class SQLTable implements Table {
             if (Map.class.isAssignableFrom(type) && !field.isAnnotationPresent(Codec.class)) {
                 continue;
             }
-    
+            
+            this.columnFields.add(field);
+        }
+    }
+
+    public Set<Class<?>> getRequiredClasses() {
+        return requiredClasses;
+    }
+
+    public void setupColumns() throws Exception {
+        for (Field field : columnFields) {
             Column column = new SQLColumn(this, field);
 
             if (column.getType() == null || column.getType().isEmpty()) {
@@ -97,7 +111,7 @@ public class SQLTable implements Table {
 
             this.columns.add(column);
         }
-        
+
         if (this.foreignKeyStorageFields.isEmpty()) {
             return;
         }
@@ -210,7 +224,7 @@ public class SQLTable implements Table {
             return false;
         }
         SQLTable table = (SQLTable) o;
-        return Objects.equals(name, table.name);
+        return name.equalsIgnoreCase(table.name);
     }
 
     @Override

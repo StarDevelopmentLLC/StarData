@@ -61,17 +61,14 @@ public class SQLDatabaseRegistry extends DatabaseRegistry<SQLDatabase> {
     @Override
     public void register(SQLDatabase object) {
         super.register(object.getName(), object);
+        object.setRegistry(this);
         if (!this.setup) {
-            for (Table table : object.getTables()) {
-                try {
-                    object.execute(table.generateCreationStatement());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            try {
+                object.setup();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
-        
-        object.setRegistry(this);
     }
     
     /**

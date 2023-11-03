@@ -23,7 +23,7 @@ public class StringSetCodec implements ObjectCodec<Set<String>> {
     }
     
     //TODO Move to StarLib eventually
-    private static String join(Collection<?> collection) {
+    public static String join(Collection<?> collection) {
         Iterator<?> iterator = collection.iterator();
         if (!iterator.hasNext()) {
             return "";

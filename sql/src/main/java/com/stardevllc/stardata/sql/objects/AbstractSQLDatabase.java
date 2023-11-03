@@ -8,6 +8,7 @@ import com.stardevllc.stardata.api.interfaces.sql.Table;
 import com.stardevllc.stardata.api.interfaces.sql.TypeHandler;
 import com.stardevllc.stardata.api.model.DatabaseRegistry;
 import com.stardevllc.stardata.api.model.ForeignKeyStorageInfo;
+import com.stardevllc.stardata.api.model.JoinType;
 import com.stardevllc.stardata.sql.StarSQL;
 import com.stardevllc.starlib.reflection.ReflectionHelper;
 
@@ -23,7 +24,6 @@ public abstract class AbstractSQLDatabase implements SQLDatabase {
     protected Logger logger;
     protected String url, name, user, password;
     protected boolean primary;
-    protected Set<Class<?>> registeredClasses = new HashSet<>();
     protected Set<Table> tables = new LinkedHashSet<>();
     protected Set<TypeHandler> typeHandlers = new HashSet<>();
     protected SQLDatabaseRegistry registry;
@@ -64,15 +64,18 @@ public abstract class AbstractSQLDatabase implements SQLDatabase {
 
     @Override
     public void registerClass(Class<?> clazz) {
-        this.registeredClasses.add(clazz);
-        
-        if (this.isSetup()) {
-            try {
-                SQLTable table = new SQLTable(this, clazz);
-                execute(table.generateCreationStatement());
-                this.tables.add(table);
-            } catch (Exception e) {}
-        }
+        try {
+            this.tables.add(new SQLTable(this, clazz));
+            if (this.isSetup()) {
+                try {
+                    SQLTable table = new SQLTable(this, clazz);
+                    execute(table.generateCreationStatement());
+                    this.tables.add(table);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (Exception e) {}
     }
 
     @Override
@@ -125,7 +128,9 @@ public abstract class AbstractSQLDatabase implements SQLDatabase {
                 }
 
                 if (column.hasForeignKey()) {
-                    data = get(column.getParentForeignKeyTable().getModelClass(), column.getParentForeignKeyColumn().getName(), data).get(0);
+                    if (column.getField().getType() == column.getParentForeignKeyTable().getModelClass()) {
+                        data = get(column.getParentForeignKeyTable().getModelClass(), column.getParentForeignKeyColumn().getName(), data).get(0);
+                    }
                 }
 
                 column.getField().setAccessible(true);
@@ -154,6 +159,80 @@ public abstract class AbstractSQLDatabase implements SQLDatabase {
         }
 
         return object;
+    }
+    
+    public <T> List<T> join(Class<T> joinHolderClass, JoinType joinType, Class<?> primary, Class<?> rightSide) throws Exception {
+        Table leftSideTable = getTable(primary);
+        Table rightSideTable = getTable(rightSide);
+
+        List<T> results = new ArrayList<>();
+        
+        if (leftSideTable == null || rightSideTable == null) {
+            return results;
+        }
+
+        Constructor<T> constructor = joinHolderClass.getDeclaredConstructor();
+        constructor.newInstance();
+        
+        String sql = "SELECT `%HOLDER%`.`%HOLDERPRIMARY%` as `%RENAMEDHOLDERPRIMARY%`, %HOLDERCOLUMNS%, `%REFERENCE%`.`%REFERENCEPRIMARY%` as `%RENAMEDREFERENCEPRIMARY%`, %REFERENCECOLUMNS% FROM `%HOLDER%` %JTYPE% JOIN `%REFERENCE%` ON `%HOLDER%`.`%HOLDERKEYCOLUMN%` = `%REFERENCE%`.`%REFERENCEPRIMARY%`;";
+        sql = sql.replaceAll("%HOLDER%", leftSideTable.getName());
+        sql = sql.replaceAll("%HOLDERPRIMARY%", leftSideTable.getPrimaryKeyColumn().getName());
+        sql = sql.replaceAll("%RENAMEDHOLDERPRIMARY%", primary.getSimpleName().toLowerCase() + "id");
+        sql = sql.replaceAll("%REFERENCE%", rightSideTable.getName());
+        sql = sql.replaceAll("%REFERENCEPRIMARY%", rightSideTable.getPrimaryKeyColumn().getName());
+        sql = sql.replaceAll("%RENAMEDREFERENCEPRIMARY%", rightSide.getSimpleName().toLowerCase() + "id");
+        sql = sql.replaceAll("%JTYPE%", joinType.name());
+        
+        StringBuilder holderColumns = new StringBuilder();
+        for (Column column : leftSideTable.getColumns()) {
+            if (column.isPrimaryKey()) {
+                continue;
+            }
+            
+            if (column.hasForeignKey()) {
+                Table parentKeyTable = column.getParentForeignKeyTable();
+                if (parentKeyTable.equals(rightSideTable)) {
+                    sql = sql.replaceAll("%HOLDERKEYCOLUMN%", column.getName());
+                }
+                continue;
+            }
+
+            holderColumns.append("`").append(leftSideTable.getName()).append("`.`").append(column.getName()).append("`").append(",");
+        }
+        holderColumns.deleteCharAt(holderColumns.length() - 1);
+        
+        StringBuilder referenceColums = new StringBuilder();
+        for (Column column : rightSideTable.getColumns()) {
+            if (column.isPrimaryKey()) {
+                continue;
+            }
+            referenceColums.append("`").append(rightSideTable.getName()).append("`.`").append(column.getName()).append("`").append(",");
+        }
+        referenceColums.deleteCharAt(referenceColums.length() - 1);
+        
+        sql = sql.replaceAll("%HOLDERCOLUMNS%", holderColumns.toString());
+        sql = sql.replaceAll("%REFERENCECOLUMNS%", referenceColums.toString());
+
+        List<Row> rows = executeQuery(sql);
+        
+        //TODO Add a class for join holders for registration to allow annotation support. 
+        Set<Field> classFields = ReflectionHelper.getClassFields(joinHolderClass);
+        for (Row row : rows) {
+            T holder = constructor.newInstance();
+            for (Field field : classFields) {
+                Object object = row.getObject(field.getName().toLowerCase());
+                if (object == null || object.toString().isEmpty() || object.toString().equals("null")) {
+                    continue;
+                }
+                
+                field.setAccessible(true);
+                field.set(holder, object);
+            }
+            
+            results.add(holder);
+        }
+
+        return results;
     }
 
     @Override
@@ -270,6 +349,11 @@ public abstract class AbstractSQLDatabase implements SQLDatabase {
                     Class<?> type = column.getField().getType();
                     if (column.getTypeHandler().matches(type)) {
                         value = column.getField().get(object);
+                        if (value instanceof Number number) {
+                            if (number.longValue() == 0) {
+                                value = null;
+                            }
+                        }
                     } else {
                         Object fieldValue = column.getField().get(object);
                         save(fieldValue);
@@ -666,9 +750,10 @@ public abstract class AbstractSQLDatabase implements SQLDatabase {
         if (this.setup) {
             return;
         }
-
-        for (Class<?> clazz : this.registeredClasses) {
-            this.tables.add(new SQLTable(this, clazz));
+        
+        for (Table table : this.tables) {
+            table.setupColumns();
+            this.tables.add(table);
         }
 
         for (Table table : getTables()) {
@@ -676,5 +761,10 @@ public abstract class AbstractSQLDatabase implements SQLDatabase {
         }
 
         this.setup = true;
+    }
+
+    @Override
+    public boolean isSetup() {
+        return setup;
     }
 }

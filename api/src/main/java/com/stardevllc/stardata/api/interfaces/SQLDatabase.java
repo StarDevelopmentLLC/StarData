@@ -3,6 +3,7 @@ package com.stardevllc.stardata.api.interfaces;
 import com.stardevllc.stardata.api.interfaces.sql.Row;
 import com.stardevllc.stardata.api.interfaces.sql.Table;
 import com.stardevllc.stardata.api.interfaces.sql.TypeHandler;
+import com.stardevllc.stardata.api.model.JoinType;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -115,4 +116,6 @@ public interface SQLDatabase extends Database {
      * @return The registered table or null if one does not exist
      */
     Table getTable(Class<?> clazz);
+
+    <T> List<T> join(Class<T> joinHolderClass, JoinType joinType, Class<?> leftSide, Class<?> rightSide) throws Exception;
 }

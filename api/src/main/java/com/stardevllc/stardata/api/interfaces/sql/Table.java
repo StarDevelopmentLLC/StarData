@@ -83,4 +83,8 @@ public interface Table extends Comparable<Table> {
      * @return The column assigned to that order.
      */
     Column getColumnByOrder(int order);
+    
+    Set<Class<?>> getRequiredClasses();
+    
+    void setupColumns() throws Exception;
 }
