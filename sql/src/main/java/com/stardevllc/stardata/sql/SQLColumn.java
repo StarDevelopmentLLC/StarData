@@ -225,6 +225,11 @@ public class SQLColumn implements Column {
     }
 
     @Override
+    public Object getFieldValue(Object holder) throws Exception {
+        return field.get(holder);
+    }
+
+    @Override
     public String getName() {
         return name;
     }

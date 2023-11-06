@@ -14,6 +14,11 @@ public interface FieldModel<T extends Database> extends Comparable<FieldModel<T>
     Field getField();
 
     /**
+     * @return The value of the field in the given object.
+     */
+    Object getFieldValue(Object holder) throws Exception;
+
+    /**
      * @return The class where the field came from.
      */
     Class<?> getFieldClass();
@@ -26,7 +31,7 @@ public interface FieldModel<T extends Database> extends Comparable<FieldModel<T>
     /**
      * @return The type handler for parsing values of this field.
      */
-    TypeHandler getTypeHandler();
+    TypeHandler<T> getTypeHandler();
 
     /**
      * @return The current object codec for parsing values of this field. 
