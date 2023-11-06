@@ -1,7 +1,7 @@
 package com.stardevllc.stardata.api.interfaces.sql;
 
 import com.stardevllc.stardata.api.annotations.*;
-import com.stardevllc.stardata.api.interfaces.SQLDatabase;
+import com.stardevllc.stardata.api.interfaces.model.ClassModel;
 import com.stardevllc.starlib.observable.ObservableValue;
 
 import java.util.Collection;
@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  * The ID annotation will automatically set it as the Primary Key and as an AutoIncrement if it an object type that this library supports as such.<br>
  * Note: Fields that are of type {@code long}, {@link Long}, {@code int} or {@link Integer} and named {@code id} are automatically set as the {@link ID} field. This is for compatibility with existing projects that I have.
  */
-public interface Table extends Comparable<Table> {
+public interface Table extends ClassModel<SQLDatabase> {
     /**
      * @return The column that is the primary key
      */
@@ -35,21 +35,6 @@ public interface Table extends Comparable<Table> {
      * Internal, used for columns that do not have an {@link Order} annotation.
      */
     void setColumnOrderIndex(int columnOrderIndex);
-
-    /**
-     * @return The database that this table is registered under.
-     */
-    SQLDatabase getDatabase();
-
-    /**
-     * @return The table name
-     */
-    String getName();
-
-    /**
-     * @return The Java Class this table represents
-     */
-    Class<?> getModelClass();
 
     /**
      * @return All of the registered columns

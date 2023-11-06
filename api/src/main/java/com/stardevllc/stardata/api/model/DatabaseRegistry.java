@@ -1,6 +1,6 @@
 package com.stardevllc.stardata.api.model;
 
-import com.stardevllc.stardata.api.interfaces.Database;
+import com.stardevllc.stardata.api.interfaces.model.Database;
 import com.stardevllc.starlib.registry.StringRegistry;
 
 import java.util.Collection;

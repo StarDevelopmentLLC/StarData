@@ -1,5 +1,6 @@
-package com.stardevllc.stardata.api.interfaces;
+package com.stardevllc.stardata.api.interfaces.model;
 
+import com.stardevllc.stardata.api.interfaces.sql.SQLDatabase;
 import com.stardevllc.stardata.api.model.DatabaseRegistry;
 
 import java.sql.SQLException;

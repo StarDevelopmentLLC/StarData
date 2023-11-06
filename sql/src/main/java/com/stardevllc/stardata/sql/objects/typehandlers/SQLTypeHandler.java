@@ -1,23 +1,26 @@
 package com.stardevllc.stardata.sql.objects.typehandlers;
 
-import com.stardevllc.stardata.api.interfaces.sql.TypeDeserializer;
-import com.stardevllc.stardata.api.interfaces.sql.TypeHandler;
-import com.stardevllc.stardata.api.interfaces.sql.TypeSerializer;
+import com.stardevllc.stardata.api.interfaces.DatabaseType;
+import com.stardevllc.stardata.api.interfaces.TypeDeserializer;
+import com.stardevllc.stardata.api.interfaces.TypeHandler;
+import com.stardevllc.stardata.api.interfaces.TypeSerializer;
+import com.stardevllc.stardata.api.interfaces.sql.SQLDatabase;
+import com.stardevllc.stardata.api.model.DefaultTypes;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-public class SQLTypeHandler implements TypeHandler {
+public class SQLTypeHandler implements TypeHandler<SQLDatabase> {
     protected final Class<?> mainClass;
     protected final Set<Class<?>> additionalClasses = new HashSet<>();
     protected final String mysqlType;
     
-    protected final TypeSerializer serializer;
-    protected final TypeDeserializer deserializer;
+    protected final TypeSerializer<SQLDatabase> serializer;
+    protected final TypeDeserializer<SQLDatabase> deserializer;
     
-    public SQLTypeHandler(Class<?> mainClass, String mysqlType, TypeSerializer serializer, TypeDeserializer deserializer) {
+    public SQLTypeHandler(Class<?> mainClass, String mysqlType, TypeSerializer<SQLDatabase> serializer, TypeDeserializer<SQLDatabase> deserializer) {
         this.mainClass = mainClass;
         this.mysqlType = mysqlType;
         this.serializer = serializer;
@@ -25,12 +28,12 @@ public class SQLTypeHandler implements TypeHandler {
     }
     
     @Override
-    public TypeSerializer getSerializer() {
+    public TypeSerializer<SQLDatabase> getSerializer() {
         return serializer;
     }
     
     @Override
-    public TypeDeserializer getDeserializer() {
+    public TypeDeserializer<SQLDatabase> getDeserializer() {
         return deserializer;
     }
     
@@ -52,10 +55,15 @@ public class SQLTypeHandler implements TypeHandler {
     }
     
     @Override
-    public String getMysqlType() {
+    public String getDataType() {
         return mysqlType;
     }
-    
+
+    @Override
+    public Set<DatabaseType> getDatabaseTypes() {
+        return Set.of(DefaultTypes.SQL);
+    }
+
     @Override
     public boolean matches(Class<?> clazz) {
         if (this.mainClass.equals(clazz)) {

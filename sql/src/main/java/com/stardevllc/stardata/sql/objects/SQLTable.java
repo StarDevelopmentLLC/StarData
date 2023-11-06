@@ -1,7 +1,10 @@
 package com.stardevllc.stardata.sql.objects;
 
 import com.stardevllc.stardata.api.annotations.*;
+import com.stardevllc.stardata.api.interfaces.model.ClassModel;
+import com.stardevllc.stardata.api.interfaces.model.FieldModel;
 import com.stardevllc.stardata.api.interfaces.sql.Column;
+import com.stardevllc.stardata.api.interfaces.sql.SQLDatabase;
 import com.stardevllc.stardata.api.interfaces.sql.Table;
 import com.stardevllc.stardata.api.model.FKAction;
 import com.stardevllc.stardata.api.model.ForeignKeyStorageInfo;
@@ -90,6 +93,11 @@ public class SQLTable implements Table {
         }
     }
 
+    @Override
+    public FieldModel<SQLDatabase> getPrimaryField() {
+        return primaryKeyColumn;
+    }
+
     public Set<Class<?>> getRequiredClasses() {
         return requiredClasses;
     }
@@ -167,6 +175,16 @@ public class SQLTable implements Table {
     }
 
     @Override
+    public Set<FieldModel<SQLDatabase>> getFieldModels() {
+        return new HashSet<>(this.columns);
+    }
+
+    @Override
+    public void setup(SQLDatabase database) throws Exception {
+
+    }
+
+    @Override
     public Set<Column> getColumns() {
         return new TreeSet<>(columns);
     }
@@ -233,7 +251,7 @@ public class SQLTable implements Table {
     }
 
     @Override
-    public int compareTo(Table o) {
+    public int compareTo(ClassModel<SQLDatabase> o) {
         return this.name.compareTo(o.getName());
     }
 

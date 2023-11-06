@@ -1,6 +1,8 @@
 package com.stardevllc.stardata.sql.objects;
 
 import com.stardevllc.stardata.api.interfaces.ObjectCodec;
+import com.stardevllc.stardata.api.interfaces.model.ClassModel;
+import com.stardevllc.stardata.api.interfaces.model.Database;
 import com.stardevllc.stardata.api.interfaces.sql.Column;
 import com.stardevllc.stardata.api.interfaces.sql.Row;
 import com.stardevllc.stardata.api.interfaces.sql.Table;
@@ -46,6 +48,16 @@ public class SQLRow implements Row {
 
     @Override
     public Table getTable() {
+        return table;
+    }
+
+    @Override
+    public Database getDatabase() {
+        return table.getDatabase();
+    }
+
+    @Override
+    public ClassModel<?> getClassModel() {
         return table;
     }
 

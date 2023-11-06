@@ -1,14 +1,14 @@
 package com.stardevllc.stardata.api.interfaces.sql;
 
-import com.stardevllc.stardata.api.model.FKAction;
 import com.stardevllc.stardata.api.annotations.Codec;
 import com.stardevllc.stardata.api.annotations.Name;
-import com.stardevllc.stardata.api.annotations.Order;
 import com.stardevllc.stardata.api.annotations.Type;
 import com.stardevllc.stardata.api.interfaces.ObjectCodec;
+import com.stardevllc.stardata.api.interfaces.TypeHandler;
+import com.stardevllc.stardata.api.interfaces.model.FieldModel;
+import com.stardevllc.stardata.api.model.FKAction;
 import com.stardevllc.stardata.api.model.ForeignKeyStorageInfo;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -22,7 +22,7 @@ import java.util.logging.Logger;
  * The name of the column can be taken from the name of the class, which will be all lower-case, or using the {@link Name} annotation.<br>
  * You can use the other annotatations to customize the columns as you see fit. This library will not check to see if your configuration is wrong, you will get SQLExceptions if it is.
  */
-public interface Column extends Comparable<Column> {
+public interface Column extends FieldModel<SQLDatabase> {
 
     /**
      * @return The logger provided via the Database
@@ -30,29 +30,9 @@ public interface Column extends Comparable<Column> {
     Logger getLogger();
 
     /**
-     * @return The order index, see the {@link Order} annotation
-     */
-    int getOrder();
-
-    /**
-     * @return The type handler for parsing values in this column.
-     */
-    TypeHandler getTypeHandler();
-
-    /**
      * @return The table that this column is a part of.
      */
     Table getTable();
-
-    /**
-     * @return The field that this column is based on.
-     */
-    Field getField();
-
-    /**
-     * @return The name of this column, this is the name in the actual database.
-     */
-    String getName();
 
     /**
      * @return The SQL Database Type
@@ -78,11 +58,6 @@ public interface Column extends Comparable<Column> {
      * @return If this column is allowed to have null values in the database.
      */
     boolean isNotNull();
-
-    /**
-     * @return The current object codec for parsing values in this column
-     */
-    ObjectCodec<?> getCodec();
 
     /**
      * @return If this column has a Foreign Key Constraint

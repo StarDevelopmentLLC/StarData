@@ -1,8 +1,8 @@
 package com.stardevllc.stardata.sql.objects;
 
-import com.stardevllc.stardata.api.interfaces.SQLDatabase;
+import com.stardevllc.stardata.api.interfaces.sql.SQLDatabase;
 import com.stardevllc.stardata.api.interfaces.sql.Table;
-import com.stardevllc.stardata.api.interfaces.sql.TypeHandler;
+import com.stardevllc.stardata.api.interfaces.TypeHandler;
 import com.stardevllc.stardata.api.model.DatabaseRegistry;
 import com.stardevllc.stardata.sql.objects.typehandlers.SQLTypeHandler;
 

@@ -1,12 +1,13 @@
 package com.stardevllc.stardata.sql.objects;
 
-import com.stardevllc.stardata.api.model.FKAction;
 import com.stardevllc.stardata.api.annotations.*;
 import com.stardevllc.stardata.api.interfaces.ObjectCodec;
-import com.stardevllc.stardata.api.interfaces.SQLDatabase;
+import com.stardevllc.stardata.api.interfaces.TypeHandler;
+import com.stardevllc.stardata.api.interfaces.model.FieldModel;
 import com.stardevllc.stardata.api.interfaces.sql.Column;
+import com.stardevllc.stardata.api.interfaces.sql.SQLDatabase;
 import com.stardevllc.stardata.api.interfaces.sql.Table;
-import com.stardevllc.stardata.api.interfaces.sql.TypeHandler;
+import com.stardevllc.stardata.api.model.FKAction;
 import com.stardevllc.stardata.api.model.ForeignKeyStorageInfo;
 
 import java.lang.reflect.Field;
@@ -20,13 +21,14 @@ import java.util.logging.Logger;
 public class SQLColumn implements Column {
     private final Table table;
     private final Field field;
+    private final Class<?> fieldClass;
 
     private final String name;
     private String type;
     private final boolean primaryKey, autoIncrement, notNull, unique;
     private final int order;
     private ObjectCodec<?> codec;
-    private TypeHandler typeHandler;
+    private TypeHandler<SQLDatabase> typeHandler;
     
     private List<ForeignKeyStorageInfo> foreignKeyStorageInfos = new ArrayList<>();
     
@@ -44,6 +46,7 @@ public class SQLColumn implements Column {
     public SQLColumn(Table table, Field field) {
         this.table = table;
         this.field = field;
+        this.fieldClass = table.getModelClass();
 
         Class<?> fieldType = field.getType();
         SQLDatabase database = table.getDatabase();
@@ -69,7 +72,7 @@ public class SQLColumn implements Column {
         }
         
         if (typeHandler == null && codec == null) {
-            for (TypeHandler typeHandler : this.table.getDatabase().getTypeHandlers()) {
+            for (TypeHandler<SQLDatabase> typeHandler : this.table.getDatabase().getTypeHandlers()) {
                 if (typeHandler.matches(this.field.getType())) {
                     this.typeHandler = typeHandler;
                     break;
@@ -104,7 +107,7 @@ public class SQLColumn implements Column {
 
             if (this.typeHandler != null) {
                 if (this.type == null || this.type.isEmpty()) {
-                    type = this.typeHandler.getMysqlType();
+                    type = this.typeHandler.getDataType();
                 }
             } else {
                 throw new IllegalArgumentException("Could not determine a handler or a codec for the field type " + field.getType().getName() + " in class " + table.getModelClass().getName());
@@ -155,6 +158,11 @@ public class SQLColumn implements Column {
     }
 
     @Override
+    public Class<?> getFieldClass() {
+        return this.fieldClass;
+    }
+
+    @Override
     public FKAction getForeignKeyOnDeleteAction() {
         return this.fkOnDelete;
     }
@@ -194,7 +202,7 @@ public class SQLColumn implements Column {
     }
 
     @Override
-    public TypeHandler getTypeHandler() {
+    public TypeHandler<SQLDatabase> getTypeHandler() {
         return typeHandler;
     }
 
@@ -211,6 +219,11 @@ public class SQLColumn implements Column {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public Table getParent() {
+        return null;
     }
 
     @Override
@@ -261,7 +274,7 @@ public class SQLColumn implements Column {
     }
 
     @Override
-    public int compareTo(Column other) {
+    public int compareTo(FieldModel other) {
         return Integer.compare(this.order, other.getOrder());
     }
 }

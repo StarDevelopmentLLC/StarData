@@ -1,17 +1,10 @@
 package com.stardevllc.stardata.api.interfaces;
 
-import com.stardevllc.stardata.api.annotations.Codec;
-import com.stardevllc.stardata.api.annotations.Type;
-import com.stardevllc.stardata.api.interfaces.sql.TypeHandler;
-
 /**
- * This is a class to allow parsing of types outside of the default supported types.<br>
- * To use this class, simply create a class that implements this interface.<br>
- * Implement the logic for both the encode and decode methods<br>
- * Then simply annotation your field(s) using the {@link Codec} annotation. And that's it for this class<br>
- * If you would like to have default handling of a Class type, please use the {@link TypeHandler} class for that.<br>
- * Why Strings? Because the default type while using a codec is a VARCHAR on the MySQL Table. This makes it much easier to implement the backend. <br>
- * An {@link IllegalArgumentException} will be thrown if you try to use the {@link Type} annotation that does not have a VARCHAR value. This is only used for setting the length of the column if you want to have it overriding the default length
+ * This interface is about transcribing objects into text and text back into objects. <br>
+ * The output of the {@code encode} method is the same as what would be put into the {@code decode} method. <br>
+ * This only happens if the stored data is not null, or if the string is not empty. <br>
+ * Codecs are intended to be used for cases where using a {@link TypeHandler} is not available. 
  * @param <T> The Java type that this codec is for
  */
 public interface ObjectCodec<T> {

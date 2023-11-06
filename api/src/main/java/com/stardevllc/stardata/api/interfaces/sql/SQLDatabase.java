@@ -1,8 +1,7 @@
-package com.stardevllc.stardata.api.interfaces;
+package com.stardevllc.stardata.api.interfaces.sql;
 
-import com.stardevllc.stardata.api.interfaces.sql.Row;
-import com.stardevllc.stardata.api.interfaces.sql.Table;
-import com.stardevllc.stardata.api.interfaces.sql.TypeHandler;
+import com.stardevllc.stardata.api.interfaces.model.Database;
+import com.stardevllc.stardata.api.interfaces.TypeHandler;
 import com.stardevllc.stardata.api.model.JoinType;
 
 import java.sql.SQLException;
@@ -78,14 +77,14 @@ public interface SQLDatabase extends Database {
     /**
      * @return The defined type handles. These include the default ones in the StarSQL default type handlers field
      */
-    Set<TypeHandler> getTypeHandlers();
+    Set<TypeHandler<SQLDatabase>> getTypeHandlers();
 
     /**
      * Adds a custom type handler specific to this database.
      *
      * @param handler The handler to add
      */
-    void addTypeHandler(TypeHandler handler);
+    void addTypeHandler(TypeHandler<SQLDatabase> handler);
 
     /**
      * @return All registered tables. This is Thread-Safe as it returns a copy of the Set
