@@ -1,4 +1,4 @@
-package com.stardevllc.stardata.sql.objects.typehandlers;
+package com.stardevllc.stardata.sql.typehandlers;
 
 import com.stardevllc.stardata.api.interfaces.DatabaseType;
 import com.stardevllc.stardata.api.interfaces.TypeDeserializer;

@@ -1,6 +1,6 @@
 package com.stardevllc.stardata.h2;
 
-import com.stardevllc.stardata.sql.objects.SQLProperties;
+import com.stardevllc.stardata.sql.SQLProperties;
 
 public class H2Properties extends SQLProperties {
     

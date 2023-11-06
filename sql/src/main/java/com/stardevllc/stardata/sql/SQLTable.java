@@ -8,6 +8,7 @@ import com.stardevllc.stardata.api.interfaces.sql.SQLDatabase;
 import com.stardevllc.stardata.api.interfaces.sql.Table;
 import com.stardevllc.stardata.api.model.FKAction;
 import com.stardevllc.stardata.api.model.ForeignKeyStorageInfo;
+import com.stardevllc.stardata.sql.annotations.ForeignKey;
 import com.stardevllc.stardata.sql.annotations.ForeignKeyStorage;
 import com.stardevllc.starlib.observable.ObservableValue;
 import com.stardevllc.starlib.reflection.ReflectionHelper;
@@ -64,7 +65,7 @@ public class SQLTable implements Table {
                 continue;
             }
             
-            com.stardevllc.stardata.sql.annotations.ForeignKey foreignKey = field.getAnnotation(com.stardevllc.stardata.sql.annotations.ForeignKey.class);
+            ForeignKey foreignKey = field.getAnnotation(ForeignKey.class);
             if (foreignKey != null) {
                 this.requiredClasses.add(foreignKey.value());
             }
@@ -181,7 +182,7 @@ public class SQLTable implements Table {
     }
 
     @Override
-    public void setup(SQLDatabase database) throws Exception {
+    public void setup(SQLDatabase database) {
 
     }
 

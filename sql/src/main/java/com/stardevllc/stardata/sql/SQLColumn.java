@@ -9,7 +9,14 @@ import com.stardevllc.stardata.api.interfaces.sql.SQLDatabase;
 import com.stardevllc.stardata.api.interfaces.sql.Table;
 import com.stardevllc.stardata.api.model.FKAction;
 import com.stardevllc.stardata.api.model.ForeignKeyStorageInfo;
+import com.stardevllc.stardata.sql.annotations.AutoIncrement;
+import com.stardevllc.stardata.sql.annotations.DBNotNull;
+import com.stardevllc.stardata.sql.annotations.FKOnDelete;
+import com.stardevllc.stardata.sql.annotations.FKOnUpdate;
+import com.stardevllc.stardata.sql.annotations.ForeignKey;
 import com.stardevllc.stardata.sql.annotations.ID;
+import com.stardevllc.stardata.sql.annotations.PrimaryKey;
+import com.stardevllc.stardata.sql.annotations.Unique;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -80,7 +87,7 @@ public class SQLColumn implements Column {
                 }
             }
             
-            com.stardevllc.stardata.sql.annotations.ForeignKey foreignKeyData = field.getAnnotation(com.stardevllc.stardata.sql.annotations.ForeignKey.class);
+            ForeignKey foreignKeyData = field.getAnnotation(ForeignKey.class);
             if (foreignKeyData != null) {
                 this.parentForeignKeyTable = database.getTable(foreignKeyData.value());
                 if (this.parentForeignKeyTable != null) {
@@ -91,14 +98,14 @@ public class SQLColumn implements Column {
                     this.typeHandler = this.parentForeignKeyColumn.getTypeHandler();
                 }
 
-                com.stardevllc.stardata.sql.annotations.FKOnDelete onDeleteAnnotation = field.getAnnotation(com.stardevllc.stardata.sql.annotations.FKOnDelete.class);
+                FKOnDelete onDeleteAnnotation = field.getAnnotation(FKOnDelete.class);
                 if (onDeleteAnnotation != null) {
                     this.fkOnDelete = onDeleteAnnotation.value();
                 } else {
                     this.fkOnDelete = foreignKeyData.onDelete();
                 }
 
-                com.stardevllc.stardata.sql.annotations.FKOnUpdate onUpdateAnnotation = field.getAnnotation(com.stardevllc.stardata.sql.annotations.FKOnUpdate.class);
+                FKOnUpdate onUpdateAnnotation = field.getAnnotation(FKOnUpdate.class);
                 if (onUpdateAnnotation != null) {
                     this.fkOnUpdate = onUpdateAnnotation.value();
                 } else {
@@ -135,12 +142,12 @@ public class SQLColumn implements Column {
             primaryKey = true;
             unique = true;
         } else {
-            primaryKey = field.isAnnotationPresent(com.stardevllc.stardata.sql.annotations.PrimaryKey.class);
-            autoIncrement = field.isAnnotationPresent(com.stardevllc.stardata.sql.annotations.AutoIncrement.class);
-            unique = field.isAnnotationPresent(com.stardevllc.stardata.sql.annotations.Unique.class);
+            primaryKey = field.isAnnotationPresent(PrimaryKey.class);
+            autoIncrement = field.isAnnotationPresent(AutoIncrement.class);
+            unique = field.isAnnotationPresent(Unique.class);
         }
 
-        notNull = field.isAnnotationPresent(com.stardevllc.stardata.sql.annotations.DBNotNull.class);
+        notNull = field.isAnnotationPresent(DBNotNull.class);
 
         if (field.isAnnotationPresent(Order.class)) {
             Order order = field.getAnnotation(Order.class);

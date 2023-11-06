@@ -1,15 +1,14 @@
 package com.stardevllc.stardata.sql;
 
+import com.stardevllc.stardata.api.interfaces.TypeHandler;
 import com.stardevllc.stardata.api.interfaces.model.Database;
-import com.stardevllc.stardata.api.interfaces.sql.SQLDatabase;
 import com.stardevllc.stardata.api.interfaces.sql.Column;
 import com.stardevllc.stardata.api.interfaces.sql.Row;
+import com.stardevllc.stardata.api.interfaces.sql.SQLDatabase;
 import com.stardevllc.stardata.api.interfaces.sql.Table;
-import com.stardevllc.stardata.api.interfaces.TypeHandler;
 import com.stardevllc.stardata.api.model.DatabaseRegistry;
 import com.stardevllc.stardata.api.model.ForeignKeyStorageInfo;
 import com.stardevllc.stardata.api.model.JoinType;
-import com.stardevllc.stardata.sql.StarSQL;
 import com.stardevllc.starlib.reflection.ReflectionHelper;
 
 import java.lang.reflect.Constructor;
@@ -25,7 +24,7 @@ public abstract class AbstractSQLDatabase implements SQLDatabase {
     protected String url, name, user, password;
     protected boolean primary;
     protected Set<Table> tables = new LinkedHashSet<>();
-    protected Set<TypeHandler> typeHandlers = new HashSet<>();
+    protected Set<TypeHandler<SQLDatabase>> typeHandlers = new HashSet<>();
     protected SQLDatabaseRegistry registry;
 
     protected final LinkedList<Object> queue = new LinkedList<>();
@@ -722,8 +721,8 @@ public abstract class AbstractSQLDatabase implements SQLDatabase {
     }
 
     @Override
-    public Set<TypeHandler> getTypeHandlers() {
-        Set<TypeHandler> typeHandlers = new HashSet<>(this.typeHandlers);
+    public Set<TypeHandler<SQLDatabase>> getTypeHandlers() {
+        Set<TypeHandler<SQLDatabase>> typeHandlers = new HashSet<>(this.typeHandlers);
         typeHandlers.addAll(StarSQL.DEFAULT_TYPE_HANDLERS);
         if (registry != null) {
             typeHandlers.addAll(registry.getTypeHandlers());
@@ -732,7 +731,7 @@ public abstract class AbstractSQLDatabase implements SQLDatabase {
     }
 
     @Override
-    public void addTypeHandler(TypeHandler handler) {
+    public void addTypeHandler(TypeHandler<SQLDatabase> handler) {
         this.typeHandlers.add(handler);
     }
 

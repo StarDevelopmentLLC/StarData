@@ -1,6 +1,6 @@
 package com.stardevllc.stardata.mysql;
 
-import com.stardevllc.stardata.sql.objects.AbstractSQLDatabase;
+import com.stardevllc.stardata.sql.AbstractSQLDatabase;
 
 import java.util.logging.Logger;
 

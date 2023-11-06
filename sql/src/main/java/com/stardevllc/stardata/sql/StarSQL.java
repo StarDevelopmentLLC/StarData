@@ -1,9 +1,9 @@
 package com.stardevllc.stardata.sql;
 
 import com.stardevllc.stardata.api.interfaces.TypeHandler;
-import com.stardevllc.stardata.sql.objects.SQLDatabaseRegistry;
-import com.stardevllc.stardata.sql.objects.typehandlers.SQLTypeHandler;
-import com.stardevllc.stardata.sql.objects.typehandlers.impl.*;
+import com.stardevllc.stardata.api.interfaces.sql.SQLDatabase;
+import com.stardevllc.stardata.sql.typehandlers.SQLTypeHandler;
+import com.stardevllc.stardata.sql.typehandlers.impl.*;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -30,7 +30,7 @@ public final class StarSQL {
      *
      * @see SQLTypeHandler
      */
-    public static final Set<TypeHandler> DEFAULT_TYPE_HANDLERS = Set.of(new BooleanHandler(), new DoubleHandler(), new EnumHandler(), new FloatHandler(), new IntegerHandler(), new LongHandler(), new StringHandler(), new UUIDHander(), new ValueHandler());
+    public static final Set<TypeHandler<SQLDatabase>> DEFAULT_TYPE_HANDLERS = Set.of(new BooleanHandler(), new DoubleHandler(), new EnumHandler(), new FloatHandler(), new IntegerHandler(), new LongHandler(), new StringHandler(), new UUIDHander(), new ValueHandler());
 
     /**
      * Creates an instance of the {@link SQLDatabaseRegistry} with a default logger or the one set with the {@code setLogger()} method

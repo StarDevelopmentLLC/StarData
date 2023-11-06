@@ -1,7 +1,7 @@
-package com.stardevllc.stardata.sql.objects.typehandlers.impl;
+package com.stardevllc.stardata.sql.typehandlers.impl;
 
+import com.stardevllc.stardata.sql.typehandlers.SQLTypeHandler;
 import com.stardevllc.starlib.reflection.ReflectionHelper;
-import com.stardevllc.stardata.sql.objects.typehandlers.SQLTypeHandler;
 
 import java.lang.reflect.Method;
 

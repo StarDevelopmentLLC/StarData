@@ -1,6 +1,6 @@
 package com.stardevllc.stardata.sqlite;
 
-import com.stardevllc.stardata.sql.objects.AbstractSQLDatabase;
+import com.stardevllc.stardata.sql.AbstractSQLDatabase;
 
 import java.util.logging.Logger;
 

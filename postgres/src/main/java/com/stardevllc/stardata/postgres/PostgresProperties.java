@@ -1,6 +1,6 @@
 package com.stardevllc.stardata.postgres;
 
-import com.stardevllc.stardata.sql.objects.SQLProperties;
+import com.stardevllc.stardata.sql.SQLProperties;
 
 public class PostgresProperties extends SQLProperties {
 

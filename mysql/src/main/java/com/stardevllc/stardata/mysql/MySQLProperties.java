@@ -1,6 +1,6 @@
 package com.stardevllc.stardata.mysql;
 
-import com.stardevllc.stardata.sql.objects.SQLProperties;
+import com.stardevllc.stardata.sql.SQLProperties;
 
 public class MySQLProperties extends SQLProperties {
 

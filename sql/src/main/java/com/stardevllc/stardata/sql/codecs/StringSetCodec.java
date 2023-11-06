@@ -1,4 +1,4 @@
-package com.stardevllc.stardata.sql.objects.codecs;
+package com.stardevllc.stardata.sql.codecs;
 
 import com.stardevllc.stardata.api.interfaces.ObjectCodec;
 

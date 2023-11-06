@@ -4,7 +4,7 @@ import com.stardevllc.stardata.api.interfaces.sql.SQLDatabase;
 import com.stardevllc.stardata.api.interfaces.sql.Table;
 import com.stardevllc.stardata.api.interfaces.TypeHandler;
 import com.stardevllc.stardata.api.model.DatabaseRegistry;
-import com.stardevllc.stardata.sql.objects.typehandlers.SQLTypeHandler;
+import com.stardevllc.stardata.sql.typehandlers.SQLTypeHandler;
 
 import java.sql.SQLException;
 import java.util.Collection;
@@ -25,7 +25,7 @@ public class SQLDatabaseRegistry extends DatabaseRegistry<SQLDatabase> {
     
     private boolean setup;
     
-    private Set<TypeHandler> typeHandlers = new HashSet<>();
+    private Set<TypeHandler<SQLDatabase>> typeHandlers = new HashSet<>();
     
     public SQLDatabaseRegistry(Logger logger) {
         super(logger);
@@ -95,7 +95,7 @@ public class SQLDatabaseRegistry extends DatabaseRegistry<SQLDatabase> {
     /**
      * @return All type handles associated with this DatabaseRegistry
      */
-    public Set<TypeHandler> getTypeHandlers() {
+    public Set<TypeHandler<SQLDatabase>> getTypeHandlers() {
         return new HashSet<>(typeHandlers);
     }
     
@@ -103,7 +103,7 @@ public class SQLDatabaseRegistry extends DatabaseRegistry<SQLDatabase> {
      * Adds a TypeHandler for all databases in this Registry
      * @param handler The TypeHandler to register
      */
-    public void addTypeHandler(TypeHandler handler) {
+    public void addTypeHandler(TypeHandler<SQLDatabase> handler) {
         this.typeHandlers.add(handler);
     }
 }

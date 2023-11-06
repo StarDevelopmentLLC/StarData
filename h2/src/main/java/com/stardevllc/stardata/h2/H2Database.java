@@ -1,8 +1,8 @@
 package com.stardevllc.stardata.h2;
 
 import com.stardevllc.stardata.api.interfaces.sql.Row;
-import com.stardevllc.stardata.sql.objects.SQLRow;
-import com.stardevllc.stardata.sql.objects.AbstractSQLDatabase;
+import com.stardevllc.stardata.sql.AbstractSQLDatabase;
+import com.stardevllc.stardata.sql.SQLRow;
 
 import java.sql.*;
 import java.util.ArrayList;

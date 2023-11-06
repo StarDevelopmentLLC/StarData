@@ -1,6 +1,6 @@
 package com.stardevllc.stardata.sqlite;
 
-import com.stardevllc.stardata.sql.objects.SQLProperties;
+import com.stardevllc.stardata.sql.SQLProperties;
 
 public class SQLiteProperties extends SQLProperties {
     
