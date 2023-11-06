@@ -1,4 +1,4 @@
-package com.stardevllc.stardata.api.annotations;
+package com.stardevllc.stardata.sql.annotations;
 
 import com.stardevllc.stardata.api.model.FKAction;
 

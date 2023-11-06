@@ -1,4 +1,4 @@
-package com.stardevllc.stardata.api.annotations;
+package com.stardevllc.stardata.sql.annotations;
 
 import java.lang.annotation.*;
 

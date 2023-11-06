@@ -1,4 +1,4 @@
-package com.stardevllc.stardata.sql.objects;
+package com.stardevllc.stardata.sql;
 
 import com.stardevllc.stardata.api.annotations.*;
 import com.stardevllc.stardata.api.interfaces.model.ClassModel;
@@ -8,6 +8,7 @@ import com.stardevllc.stardata.api.interfaces.sql.SQLDatabase;
 import com.stardevllc.stardata.api.interfaces.sql.Table;
 import com.stardevllc.stardata.api.model.FKAction;
 import com.stardevllc.stardata.api.model.ForeignKeyStorageInfo;
+import com.stardevllc.stardata.sql.annotations.ForeignKeyStorage;
 import com.stardevllc.starlib.observable.ObservableValue;
 import com.stardevllc.starlib.reflection.ReflectionHelper;
 
@@ -58,12 +59,12 @@ public class SQLTable implements Table {
                 continue;
             }
 
-            if (field.isAnnotationPresent(ForeignKeyStorage.class)) {
+            if (field.isAnnotationPresent(com.stardevllc.stardata.sql.annotations.ForeignKeyStorage.class)) {
                 this.foreignKeyStorageFields.add(field);
                 continue;
             }
             
-            ForeignKey foreignKey = field.getAnnotation(ForeignKey.class);
+            com.stardevllc.stardata.sql.annotations.ForeignKey foreignKey = field.getAnnotation(com.stardevllc.stardata.sql.annotations.ForeignKey.class);
             if (foreignKey != null) {
                 this.requiredClasses.add(foreignKey.value());
             }
@@ -125,7 +126,7 @@ public class SQLTable implements Table {
         }
 
         for (Field field : this.foreignKeyStorageFields) {
-            ForeignKeyStorage annotation = field.getAnnotation(ForeignKeyStorage.class);
+            com.stardevllc.stardata.sql.annotations.ForeignKeyStorage annotation = field.getAnnotation(ForeignKeyStorage.class);
             ForeignKeyStorageInfo info = new ForeignKeyStorageInfo(field, annotation.clazz(), annotation.field(), annotation.mapKeyField());
             this.primaryKeyColumn.getForeignKeyStorageInfos().add(info);
         }

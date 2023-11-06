@@ -1,4 +1,4 @@
-package com.stardevllc.stardata.sql.objects;
+package com.stardevllc.stardata.sql;
 
 import com.stardevllc.stardata.api.interfaces.sql.Table;
 

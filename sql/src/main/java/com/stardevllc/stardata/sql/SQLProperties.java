@@ -1,4 +1,4 @@
-package com.stardevllc.stardata.sql.objects;
+package com.stardevllc.stardata.sql;
 
 public class SQLProperties {
     protected String databaseName, username, password;
