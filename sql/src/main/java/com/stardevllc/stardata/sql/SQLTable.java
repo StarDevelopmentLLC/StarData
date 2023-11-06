@@ -3,9 +3,9 @@ package com.stardevllc.stardata.sql;
 import com.stardevllc.stardata.api.annotations.*;
 import com.stardevllc.stardata.api.interfaces.model.ClassModel;
 import com.stardevllc.stardata.api.interfaces.model.FieldModel;
-import com.stardevllc.stardata.api.interfaces.sql.Column;
-import com.stardevllc.stardata.api.interfaces.sql.SQLDatabase;
-import com.stardevllc.stardata.api.interfaces.sql.Table;
+import com.stardevllc.stardata.sql.interfaces.Column;
+import com.stardevllc.stardata.sql.interfaces.SQLDatabase;
+import com.stardevllc.stardata.sql.interfaces.Table;
 import com.stardevllc.stardata.api.model.FKAction;
 import com.stardevllc.stardata.api.model.ForeignKeyStorageInfo;
 import com.stardevllc.stardata.sql.annotations.ForeignKey;
@@ -230,7 +230,7 @@ public class SQLTable implements Table {
             sb.append(", ");
         });
 
-        sb.delete(sb.length() - 2, sb.length() - 1);
+        sb.delete(sb.length() - 2, sb.length());
         sb.append(");");
         return sb.toString();
     }

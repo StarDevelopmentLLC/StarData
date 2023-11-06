@@ -3,9 +3,9 @@ package com.stardevllc.stardata.sql;
 import com.stardevllc.stardata.api.interfaces.ObjectCodec;
 import com.stardevllc.stardata.api.interfaces.model.ClassModel;
 import com.stardevllc.stardata.api.interfaces.model.Database;
-import com.stardevllc.stardata.api.interfaces.sql.Column;
-import com.stardevllc.stardata.api.interfaces.sql.Row;
-import com.stardevllc.stardata.api.interfaces.sql.Table;
+import com.stardevllc.stardata.sql.interfaces.Column;
+import com.stardevllc.stardata.sql.interfaces.Row;
+import com.stardevllc.stardata.sql.interfaces.Table;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;

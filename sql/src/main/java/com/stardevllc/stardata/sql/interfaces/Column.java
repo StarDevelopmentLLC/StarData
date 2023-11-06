@@ -1,4 +1,4 @@
-package com.stardevllc.stardata.api.interfaces.sql;
+package com.stardevllc.stardata.sql.interfaces;
 
 import com.stardevllc.stardata.api.annotations.Codec;
 import com.stardevllc.stardata.api.annotations.Name;

@@ -4,7 +4,7 @@ import com.stardevllc.stardata.api.interfaces.DatabaseType;
 import com.stardevllc.stardata.api.interfaces.TypeDeserializer;
 import com.stardevllc.stardata.api.interfaces.TypeHandler;
 import com.stardevllc.stardata.api.interfaces.TypeSerializer;
-import com.stardevllc.stardata.api.interfaces.sql.SQLDatabase;
+import com.stardevllc.stardata.sql.interfaces.SQLDatabase;
 import com.stardevllc.stardata.api.model.DefaultTypes;
 
 import java.util.HashSet;

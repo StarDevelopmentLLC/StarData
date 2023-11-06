@@ -1,6 +1,6 @@
 package com.stardevllc.stardata.sql.annotations;
 
-import com.stardevllc.stardata.api.interfaces.sql.Table;
+import com.stardevllc.stardata.sql.interfaces.Table;
 
 import java.lang.annotation.*;
 

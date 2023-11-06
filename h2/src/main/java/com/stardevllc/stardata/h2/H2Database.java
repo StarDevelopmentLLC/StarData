@@ -1,6 +1,6 @@
 package com.stardevllc.stardata.h2;
 
-import com.stardevllc.stardata.api.interfaces.sql.Row;
+import com.stardevllc.stardata.sql.interfaces.Row;
 import com.stardevllc.stardata.sql.AbstractSQLDatabase;
 import com.stardevllc.stardata.sql.SQLRow;
 

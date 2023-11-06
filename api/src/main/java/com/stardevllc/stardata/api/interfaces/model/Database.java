@@ -1,6 +1,5 @@
 package com.stardevllc.stardata.api.interfaces.model;
 
-import com.stardevllc.stardata.api.interfaces.sql.SQLDatabase;
 import com.stardevllc.stardata.api.model.DatabaseRegistry;
 
 import java.sql.SQLException;
@@ -9,7 +8,7 @@ import java.util.logging.Logger;
 
 /**
  * Represents a generic database, only really used for SQL based things for now. <br>
- * See {@link SQLDatabase} for more information.
+ * See {@link Database} for more information.
  */
 public interface Database {
     /**
