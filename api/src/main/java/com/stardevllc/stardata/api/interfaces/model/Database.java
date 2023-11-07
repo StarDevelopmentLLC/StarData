@@ -47,6 +47,7 @@ public interface Database {
      * @return The list of objects that Match. This should never return a null object. If there is nothing that matches, it will be an empty list.
      * @throws SQLException Any SQL errors that happen
      */
+    @Deprecated
     <T> List<T> get(Class<T> clazz, String[] keys, Object[] values) throws Exception;
 
     /**
@@ -59,6 +60,7 @@ public interface Database {
      * @return The list of objects that match
      * @throws SQLException Any SQL errors
      */
+    @Deprecated
     <T> List<T> get(Class<T> clazz, String key, Object value) throws Exception;
 
     /**

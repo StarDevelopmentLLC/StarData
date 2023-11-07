@@ -116,5 +116,6 @@ public interface SQLDatabase extends Database {
      */
     Table getTable(Class<?> clazz);
 
+    @Deprecated
     <T> List<T> join(Class<T> joinHolderClass, JoinType joinType, Class<?> leftSide, Class<?> rightSide) throws Exception;
 }
