@@ -40,6 +40,10 @@ public class SqlColumnKey {
     public String getAlias() {
         return alias;
     }
+    
+    public String getName() {
+        return alias != null ? alias : this.columnName;
+    }
 
     @Override
     public boolean equals(Object o) {

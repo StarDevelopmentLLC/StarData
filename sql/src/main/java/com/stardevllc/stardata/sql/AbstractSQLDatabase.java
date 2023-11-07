@@ -9,6 +9,7 @@ import com.stardevllc.stardata.sql.interfaces.Table;
 import com.stardevllc.stardata.api.model.DatabaseRegistry;
 import com.stardevllc.stardata.api.model.ForeignKeyStorageInfo;
 import com.stardevllc.stardata.api.model.JoinType;
+import com.stardevllc.stardata.sql.statements.SqlSelect;
 import com.stardevllc.starlib.reflection.ReflectionHelper;
 
 import java.lang.reflect.Constructor;
@@ -248,30 +249,19 @@ public abstract class AbstractSQLDatabase implements SQLDatabase {
         if (table == null) {
             return null;
         }
+        
+        SqlSelect select = new SqlSelect(table, true);
+        
+        select.where(whereClause -> {
+            int size = columns.length;
+            whereClause.columns(columns);
+            whereClause.values(values);
+            String[] operators = new String[size];
+            Arrays.fill(operators, "=");
+            whereClause.conditions(operators);
+        });
 
-        Map<Column, Object> tableColumns = new HashMap<>();
-
-        for (int i = 0; i < columns.length; i++) {
-            Column column = table.getColumn(columns[i]);
-            if (column != null) {
-                tableColumns.put(column, values[i]);
-            }
-        }
-
-        List<String> whereConditions = new ArrayList<>();
-        tableColumns.forEach((column, value) -> whereConditions.add(column.getName() + "='" + value.toString() + "'"));
-
-        StringBuilder sb = new StringBuilder("select * from " + table.getName() + " where ");
-        for (int i = 0; i < whereConditions.size(); i++) {
-            sb.append(whereConditions.get(i));
-            if (i < whereConditions.size() - 1) {
-                sb.append(" and ");
-            }
-        }
-
-        sb.append(";");
-
-        List<Row> rows = executeQuery(sb.toString());
+        List<Row> rows = executeQuery(select.build());
 
         List<T> objects = new ArrayList<>();
         for (Row row : rows) {
@@ -287,13 +277,18 @@ public abstract class AbstractSQLDatabase implements SQLDatabase {
         if (table == null) {
             return null;
         }
+        
+        SqlSelect select = new SqlSelect(table, true);
 
         Column column = table.getColumn(columnName);
         if (column == null) {
             return new ArrayList<>();
         }
+        
+        select.addColumn(column);
+        select.addWhereCondition(column.getName(), "=", value);
 
-        List<Row> rows = executeQuery("select * from " + table.getName() + " where " + column.getName() + "='" + value + "';");
+        List<Row> rows = executeQuery(select.build());
 
         List<T> objects = new ArrayList<>();
         for (Row row : rows) {
@@ -309,9 +304,10 @@ public abstract class AbstractSQLDatabase implements SQLDatabase {
             return null;
         }
 
+        SqlSelect select = new SqlSelect(table, true);
+        List<Row> rows = executeQuery(select.build());
         List<T> objects = new ArrayList<>();
-
-        List<Row> rows = executeQuery("select * from " + table.getName());
+        
         for (Row row : rows) {
             objects.add(parseObjectFromRow(clazz, row));
         }

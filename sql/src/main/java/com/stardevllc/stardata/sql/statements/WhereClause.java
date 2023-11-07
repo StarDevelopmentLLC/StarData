@@ -7,21 +7,40 @@ import java.util.List;
 
 public class WhereClause {
     private List<SqlColumnKey> columns = new LinkedList<>();
-    private List<String> operators = new LinkedList<>();
+    private List<String> conditions = new LinkedList<>();
     private List<Object> values = new LinkedList<>();
+    private List<WhereOperator> operators = new LinkedList<>();
 
-    public WhereClause addCondition(String column, String operator, Object value) {
-        this.columns.add(new SqlColumnKey(column));
-        this.operators.add(operator);
+    public WhereClause addCondition(String column, String condition, Object value) {
+        return addCondition(new SqlColumnKey(column), condition, value);
+    }
+
+    public WhereClause addCondition(WhereOperator operator, String column, String condition, Object value) {
+        return addCondition(operator, new SqlColumnKey(column), condition, value);
+    }
+
+    public WhereClause addCondition(WhereOperator operator, SqlColumnKey columnKey, String condition, Object value) {
+        this.columns.add(columnKey);
+        this.conditions.add(condition);
         this.values.add(value);
+        this.operators.add(operator);
         return this;
     }
     
-    public WhereClause addCondition(SqlColumnKey columnKey, String operator, Object value) {
+    public WhereClause addCondition(SqlColumnKey columnKey, String condition, Object value) {
         this.columns.add(columnKey);
-        this.operators.add(operator);
+        this.conditions.add(condition);
         this.values.add(value);
+        this.operators.add(WhereOperator.NONE);
         return this;
+    }
+    
+    public WhereClause addCondition(Column column, String condition, Object value) {
+        return addCondition(column.toKey(), condition, value);
+    }
+
+    public WhereClause addCondition(WhereOperator operator, Column column, String condition, Object value) {
+        return addCondition(operator, column.toKey(), condition, value);
     }
 
     public WhereClause columns(String... columns) {
@@ -50,9 +69,9 @@ public class WhereClause {
         return this;
     }
 
-    public WhereClause operators(String... operators) {
+    public WhereClause conditions(String... operators) {
         if (operators != null) {
-            this.operators.addAll(List.of(operators));
+            this.conditions.addAll(List.of(operators));
         }
         return this;
     }
@@ -64,13 +83,20 @@ public class WhereClause {
         return this;
     }
     
+    public WhereClause operators(WhereOperator... operators) {
+        if (operators != null) {
+            this.operators.addAll(List.of(operators));
+        }
+        return this;
+    }
+    
     public String build() {
         int columnSize = this.columns.size();
-        int operatorsSize = this.operators.size();
+        int conditionsSize = this.conditions.size();
         int valuesSize = this.values.size();
         
-        if (columnSize != operatorsSize || columnSize != valuesSize) {
-            throw new IllegalArgumentException("Columns, operators and values do not have the same amount of entries.");
+        if (columnSize != conditionsSize || columnSize != valuesSize) {
+            throw new IllegalArgumentException("Columns, conditions and values do not have the same amount of entries.");
         }
         
         if (columnSize == 0) {
@@ -80,14 +106,17 @@ public class WhereClause {
         StringBuilder sb = new StringBuilder("WHERE ");
         
         for (int i = 0; i < columnSize; i++) {
+            WhereOperator operator = this.operators.get(i);
+            if (operator != null && operator != WhereOperator.NONE) {
+                sb.append(operator.name()).append(" ");
+            }
             SqlColumnKey column = this.columns.get(i);
             if (column.getTableName() != null) {
                 sb.append("`").append(column.getTableName()).append("`.");
             }
-            sb.append("`").append(column.getColumnName()).append("`").append(this.operators.get(i)).append("'").append(this.values.get(i)).append("'").append(" AND ");
+            sb.append("`").append(column.getColumnName()).append("`").append(this.conditions.get(i)).append("'").append(this.values.get(i)).append("' ");
         }
         
-        sb.delete(sb.length() - 5, sb.length());
-        return sb.toString();
+        return sb.toString().trim();
     }
 }

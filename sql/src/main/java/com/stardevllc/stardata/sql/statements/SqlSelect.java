@@ -130,7 +130,7 @@ public class SqlSelect implements SqlStatement {
     }
 
     public SqlSelect whereOperators(String... whereOperators) {
-        this.whereClause.operators(whereOperators);
+        this.whereClause.conditions(whereOperators);
         return this;
     }
 

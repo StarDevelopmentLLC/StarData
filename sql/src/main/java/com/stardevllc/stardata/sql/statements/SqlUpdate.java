@@ -95,7 +95,7 @@ public class SqlUpdate implements SqlStatement {
     }
 
     public SqlUpdate whereOperators(String... whereOperators) {
-        this.whereClause.operators(whereOperators);
+        this.whereClause.conditions(whereOperators);
         return this;
     }
 
