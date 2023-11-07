@@ -8,9 +8,9 @@ import java.util.List;
 
 public class SqlInsert implements SqlStatement {
 
-    private final String tableName;
-    private List<SqlColumnKey> columns = new LinkedList<>();
-    private List<List<Object>> rows = new LinkedList<>();
+    protected final String tableName;
+    protected List<SqlColumnKey> columns = new LinkedList<>();
+    protected List<List<Object>> rows = new LinkedList<>();
 
     public SqlInsert(String tableName) {
         this.tableName = tableName;
@@ -28,7 +28,7 @@ public class SqlInsert implements SqlStatement {
     public SqlInsert columns(String... columns) {
         if (columns != null) {
             for (String column : columns) {
-                this.columns.add(new SqlColumnKey(null, column, null));
+                this.columns.add(new SqlColumnKey(this.tableName, column, null));
             }
         }
 

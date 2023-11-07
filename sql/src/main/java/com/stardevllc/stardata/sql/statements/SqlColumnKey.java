@@ -2,6 +2,8 @@ package com.stardevllc.stardata.sql.statements;
 
 import com.stardevllc.stardata.sql.interfaces.Column;
 
+import java.util.Objects;
+
 public class SqlColumnKey {
     private final String tableName, columnName, alias;
 
@@ -37,5 +39,29 @@ public class SqlColumnKey {
 
     public String getAlias() {
         return alias;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        SqlColumnKey that = (SqlColumnKey) o;
+
+        if (!Objects.equals(tableName, that.tableName)) {
+            return false;
+        }
+        return Objects.equals(columnName, that.columnName);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = tableName != null ? tableName.hashCode() : 0;
+        result = 31 * result + (columnName != null ? columnName.hashCode() : 0);
+        return result;
     }
 }
