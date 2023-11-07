@@ -22,7 +22,7 @@ public class SQLTable implements Table {
     private String name;
     private final Class<?> modelClass;
     private final Set<Column> columns = new TreeSet<>();
-    private AbstractSQLDatabase database;
+    private SQLDatabase database;
     private Column primaryKeyColumn;
     private int columnOrderIndex = 1000;
 
@@ -37,7 +37,7 @@ public class SQLTable implements Table {
      * @param database   The Database that this table is registered to.
      * @param modelClass The class to use
      */
-    public SQLTable(AbstractSQLDatabase database, Class<?> modelClass) throws Exception {
+    public SQLTable(SQLDatabase database, Class<?> modelClass) throws Exception {
         this.database = database;
         this.modelClass = modelClass;
 
@@ -60,7 +60,7 @@ public class SQLTable implements Table {
                 continue;
             }
 
-            if (field.isAnnotationPresent(com.stardevllc.stardata.sql.annotations.ForeignKeyStorage.class)) {
+            if (field.isAnnotationPresent(ForeignKeyStorage.class)) {
                 this.foreignKeyStorageFields.add(field);
                 continue;
             }
@@ -127,7 +127,7 @@ public class SQLTable implements Table {
         }
 
         for (Field field : this.foreignKeyStorageFields) {
-            com.stardevllc.stardata.sql.annotations.ForeignKeyStorage annotation = field.getAnnotation(ForeignKeyStorage.class);
+            ForeignKeyStorage annotation = field.getAnnotation(ForeignKeyStorage.class);
             ForeignKeyStorageInfo info = new ForeignKeyStorageInfo(field, annotation.clazz(), annotation.field(), annotation.mapKeyField());
             this.primaryKeyColumn.getForeignKeyStorageInfos().add(info);
         }
@@ -162,7 +162,7 @@ public class SQLTable implements Table {
     }
 
     @Override
-    public AbstractSQLDatabase getDatabase() {
+    public SQLDatabase getDatabase() {
         return database;
     }
 

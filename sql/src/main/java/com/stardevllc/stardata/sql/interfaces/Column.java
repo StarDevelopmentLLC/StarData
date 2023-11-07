@@ -8,6 +8,7 @@ import com.stardevllc.stardata.api.interfaces.TypeHandler;
 import com.stardevllc.stardata.api.interfaces.model.FieldModel;
 import com.stardevllc.stardata.api.model.FKAction;
 import com.stardevllc.stardata.api.model.ForeignKeyStorageInfo;
+import com.stardevllc.stardata.sql.statements.SqlColumnKey;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -38,6 +39,17 @@ public interface Column extends FieldModel<SQLDatabase> {
      * @return The SQL Database Type
      */
     String getType();
+
+    /**
+     * @return The SqlColumnKey that is represented by this column.
+     */
+    SqlColumnKey toKey();
+
+    /**
+     * @param alias The column alias to use for the statement
+     * @return The SqlColumnKey that is represented by this column (with alias);
+     */
+    SqlColumnKey toKey(String alias);
 
     /**
      * @return If this column is unique in the database

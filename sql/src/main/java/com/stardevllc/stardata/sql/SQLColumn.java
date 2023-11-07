@@ -17,6 +17,7 @@ import com.stardevllc.stardata.sql.annotations.ForeignKey;
 import com.stardevllc.stardata.sql.annotations.ID;
 import com.stardevllc.stardata.sql.annotations.PrimaryKey;
 import com.stardevllc.stardata.sql.annotations.Unique;
+import com.stardevllc.stardata.sql.statements.SqlColumnKey;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -163,6 +164,16 @@ public class SQLColumn implements Column {
             this.order = table.getColumnOrderIndex();
             table.setColumnOrderIndex(this.order + 1);
         }
+    }
+
+    @Override
+    public SqlColumnKey toKey() {
+        return toKey(null);
+    }
+
+    @Override
+    public SqlColumnKey toKey(String alias) {
+        return new SqlColumnKey(this.table.getName(), this.name, alias);
     }
 
     @Override
