@@ -30,7 +30,7 @@ dependencies {
     api project(path: ':api', configuration: 'shadow')
     api project(':sql')
     api 'com.h2database:h2:2.2.220'
-    compileOnly 'com.github.StarDevelopmentLLC:StarLib:1.0.0-SNAPSHOT'
+    compileOnly 'com.github.StarDevelopmentLLC:StarLib:1.0.0-alpha.1'
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)

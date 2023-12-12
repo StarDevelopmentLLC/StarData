@@ -14,7 +14,7 @@ group 'com.stardevllc.stardata'
 version '0.0.1-SNAPSHOT'
 
 dependencies {
-    implementation 'com.github.StarDevelopmentLLC:StarLib:1.0.0-SNAPSHOT'
+    implementation 'com.github.StarDevelopmentLLC:StarLib:1.0.0-alpha.1'
 }
 
 shadowJar {

@@ -29,7 +29,7 @@ jar.finalizedBy(shadowJar)
 
 dependencies {
     api project(path: ':api', configuration: 'shadow')
-    implementation 'com.github.StarDevelopmentLLC:StarLib:1.0.0-SNAPSHOT'
+    implementation 'com.github.StarDevelopmentLLC:StarLib:1.0.0-alpha.1'
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
